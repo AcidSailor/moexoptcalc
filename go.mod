@@ -3,7 +3,7 @@ module github.com/acidsailor/moexoptcalc
 go 1.26
 
 require (
-	github.com/acidsailor/restkit v0.1.1
+	github.com/acidsailor/restkit v0.1.2
 	github.com/stretchr/testify v1.11.1
 )
 
