@@ -1,0 +1,58 @@
+overlay: 1.0.0
+x-speakeasy-jsonpath: rfc9535
+info:
+  title: moexoptcalc codegen patches
+  version: 0.1.0
+# Single overlay feeding ONLY the oapi-codegen branch (upstream -> spec.json ->
+# oapi-codegen). The MCP document (spec-deref.json) is built straight from
+# spec-upstream.json, so these Go-specific transforms don't leak into the MCP
+# schema. Each action makes the spec digestible for oapi-codegen v2
+# (kin-openapi) or matches the wire types MOEX returns; comments say which.
+actions:
+  # MOEX returns naive timestamps ("2026-05-12T21:39:22", no TZ). With
+  # `format: date-time` oapi-codegen emits time.Time, whose unmarshal demands
+  # RFC3339 and fails on the bare value. Map to the package-local DateTime
+  # (params.go) via x-go-type: it (un)marshals the bare "2006-01-02T15:04:05"
+  # through Europe/Moscow, so the instant is correct (MOEX is Moscow-local). No
+  # x-go-type-import — DateTime lives in the generated `moexoptcalc` package.
+  # Add x-go-type first (predicate still matches), then strip `format:
+  # date-time` so oapi-codegen honours the override. Only
+  # OptionSeries.updatetime carries it today; the filter covers future ones.
+  - target: $..[?(@.format == 'date-time')]
+    update:
+      x-go-type: DateTime
+  - target: $..[?(@.format == 'date-time')].format
+    remove: true
+
+  # Date-only fields ("2026-05-12"). Stdlib time.Time can't parse a bare date,
+  # and oapi-codegen's default openapi_types.Date drags in
+  # github.com/oapi-codegen/runtime/types. Map to the package-local Date
+  # (params.go) via x-go-type: typed, correct (it (un)marshals "2006-01-02"),
+  # dependency-free. No x-go-type-import — Date lives in the generated
+  # `moexoptcalc` package. Add x-go-type first (predicate still matches), then
+  # strip `format: date` so oapi-codegen honours the override.
+  - target: $..[?(@.format == 'date')]
+    update:
+      x-go-type: Date
+  - target: $..[?(@.format == 'date')].format
+    remove: true
+
+  # Bare `number` maps to float32, which loses precision and changes the JSON
+  # text of prices/greeks. `format: double` makes oapi-codegen emit float64.
+  - target: $..[?(@.type == 'number')]
+    update:
+      format: double
+
+  # kin-openapi (oapi-codegen v2's parser) types Schema.exclusiveMinimum as a
+  # bool and HARD-ERRORS on the 3.1 numeric form ("cannot unmarshal number into
+  # field Schema.exclusiveMinimum of type bool"). Drop it — a constraint,
+  # irrelevant to generated structs (models-only output emits no validation).
+  - target: $..exclusiveMinimum
+    remove: true
+
+  # Silence the "OpenAPI 3.1.x is not yet supported" warning that `task gen`
+  # treats as failure. The schema bodies are already 3.0-compatible (no
+  # type:[...,null], no nullable, no const/$defs), so relabelling to 3.0.3 is
+  # safe and changes no generated type. Affects only the codegen input.
+  - target: $.openapi
+    update: "3.0.3"

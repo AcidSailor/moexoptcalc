@@ -1,0 +1,5617 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Опционный калькулятор",
+    "version": "1.4.1"
+  },
+  "servers": [
+    {
+      "url": "/iss/apps/option-calc/v1"
+    }
+  ],
+  "paths": {
+    "/assets": {
+      "get": {
+        "tags": [
+          "Опционы"
+        ],
+        "summary": "Список базовых активов",
+        "description": "Список базовых активов",
+        "operationId": "assets_assets_get",
+        "parameters": [
+          {
+            "description": "Тип базового актива",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "commodity",
+                    "currency",
+                    "futures",
+                    "index",
+                    "share"
+                  ],
+                  "title": "AssetType",
+                  "description": "Тип базового актива"
+                }
+              ],
+              "description": "Тип базового актива"
+            },
+            "name": "asset_type",
+            "in": "query"
+          },
+          {
+            "description": "Подтип базового актива для фьючерсов",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "commodity",
+                    "currency",
+                    "index",
+                    "share"
+                  ],
+                  "title": "AssetSubtype",
+                  "description": "Подтип фьючерса (базового актива)"
+                }
+              ],
+              "description": "Подтип базового актива для фьючерсов"
+            },
+            "name": "asset_subtype",
+            "in": "query"
+          },
+          {
+            "description": "Фильтр названия БА",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 8,
+              "title": "Query",
+              "description": "Фильтр названия БА"
+            },
+            "name": "query",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "asset_code": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Asset Code",
+                        "description": "Торговый код базового актива",
+                        "examples": [
+                          "ABCDEFGIJKL"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "maxLength": 256,
+                        "title": "Title",
+                        "description": "Наименование базового актива",
+                        "examples": [
+                          "Cъешь еще этих мягких французских булок да выпей же чаю"
+                        ]
+                      },
+                      "asset_type": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Asset Type",
+                        "description": "Тип базового актива"
+                      },
+                      "asset_subtype": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Asset Subtype",
+                        "description": "Подтип базового актива - фьючерса"
+                      }
+                    },
+                    "type": "object",
+                    "required": [
+                      "asset_code",
+                      "title",
+                      "asset_type"
+                    ],
+                    "title": "Asset",
+                    "description": "Базовый актив"
+                  },
+                  "type": "array",
+                  "title": "Response Assets Assets Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{asset_code}": {
+      "get": {
+        "tags": [
+          "Опционы"
+        ],
+        "summary": "Описание Базового актива",
+        "operationId": "asset_detail_assets__asset_code__get",
+        "parameters": [
+          {
+            "description": "Торговый код БА",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 12,
+              "title": "Asset Code",
+              "description": "Торговый код БА"
+            },
+            "name": "asset_code",
+            "in": "path"
+          },
+          {
+            "description": "Тип базового актива",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "commodity",
+                    "currency",
+                    "futures",
+                    "index",
+                    "share"
+                  ],
+                  "title": "AssetType",
+                  "description": "Тип базового актива"
+                }
+              ],
+              "description": "Тип базового актива"
+            },
+            "name": "asset_type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Описание Базового актива",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "asset_code": {
+                      "type": "string",
+                      "maxLength": 12,
+                      "title": "Asset Code",
+                      "description": "Торговый код базового актива",
+                      "examples": [
+                        "ABCDEFGIJKL"
+                      ]
+                    },
+                    "title": {
+                      "type": "string",
+                      "maxLength": 256,
+                      "title": "Title",
+                      "description": "Наименование базового актива",
+                      "examples": [
+                        "Cъешь еще этих мягких французских булок да выпей же чаю"
+                      ]
+                    },
+                    "asset_type": {
+                      "type": "string",
+                      "maxLength": 12,
+                      "title": "Asset Type",
+                      "description": "Тип базового актива"
+                    },
+                    "asset_subtype": {
+                      "type": "string",
+                      "maxLength": 12,
+                      "title": "Asset Subtype",
+                      "description": "Подтип базового актива - фьючерса"
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "asset_code",
+                    "title",
+                    "asset_type"
+                  ],
+                  "title": "Asset",
+                  "description": "Базовый актив"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{asset_code}/futures": {
+      "get": {
+        "tags": [
+          "Опционы"
+        ],
+        "summary": "Список фьючерсов",
+        "description": "Список фьючерсов для БА",
+        "operationId": "all_futures_assets__asset_code__futures_get",
+        "parameters": [
+          {
+            "description": "Торговый код базового актива (фьючерса)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 12,
+              "title": "Asset Code",
+              "description": "Торговый код базового актива (фьючерса)"
+            },
+            "name": "asset_code",
+            "in": "path"
+          },
+          {
+            "description": "Дата погашения",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Expiration Date",
+              "description": "Дата погашения"
+            },
+            "name": "expiration_date",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "futures_code": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Futures Code",
+                        "description": "Краткий код фьючерса",
+                        "examples": [
+                          "XXXXXXXXXXXX"
+                        ]
+                      },
+                      "asset_code": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Asset Code",
+                        "description": "Торговый код базового актива"
+                      },
+                      "asset_type": {
+                        "allOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "commodity",
+                              "currency",
+                              "futures",
+                              "index",
+                              "share"
+                            ],
+                            "title": "AssetType",
+                            "description": "Тип базового актива"
+                          }
+                        ],
+                        "description": "Тип базового актива"
+                      },
+                      "expiration_date": {
+                        "type": "string",
+                        "format": "date",
+                        "title": "Expiration Date",
+                        "description": "Дата погашения",
+                        "examples": [
+                          "YYYY-MM-DD"
+                        ]
+                      }
+                    },
+                    "type": "object",
+                    "required": [
+                      "futures_code",
+                      "asset_code",
+                      "asset_type",
+                      "expiration_date"
+                    ],
+                    "title": "Futures",
+                    "description": "Фьючерс"
+                  },
+                  "type": "array",
+                  "title": "Response All Futures Assets  Asset Code  Futures Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{asset_code}/options": {
+      "get": {
+        "tags": [
+          "Опционы"
+        ],
+        "summary": "Список опционов на базовый актив",
+        "description": "Список опционов на БА",
+        "operationId": "all_options_assets__asset_code__options_get",
+        "parameters": [
+          {
+            "description": "Торговый код БА",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 12,
+              "title": "Asset Code",
+              "description": "Торговый код БА"
+            },
+            "name": "asset_code",
+            "in": "path"
+          },
+          {
+            "description": "Тип базового актива",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "commodity",
+                    "currency",
+                    "futures",
+                    "index",
+                    "share"
+                  ],
+                  "title": "AssetType",
+                  "description": "Тип базового актива"
+                }
+              ],
+              "description": "Тип базового актива"
+            },
+            "name": "asset_type",
+            "in": "query"
+          },
+          {
+            "description": "Дата исполнения",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Expiration Date",
+              "description": "Дата исполнения"
+            },
+            "name": "expiration_date",
+            "in": "query"
+          },
+          {
+            "description": "Вид серии опционов",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "W",
+                    "M",
+                    "Q"
+                  ],
+                  "title": "OptionSeriesType",
+                  "description": "Тип серии опциона"
+                }
+              ],
+              "description": "Вид серии опционов"
+            },
+            "name": "series_type",
+            "in": "query"
+          },
+          {
+            "description": "Cтрайк",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Strike",
+              "description": "Cтрайк"
+            },
+            "name": "strike",
+            "in": "query"
+          },
+          {
+            "description": "Тип опциона (call, put)",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "call",
+                    "put"
+                  ],
+                  "title": "OptionType",
+                  "description": "Тип опциона"
+                }
+              ],
+              "description": "Тип опциона (call, put)"
+            },
+            "name": "option_type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "secid": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Secid",
+                        "description": "Торговый код опциона",
+                        "examples": [
+                          "XXXXXXXXXXXX"
+                        ]
+                      },
+                      "asset_code": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Asset Code",
+                        "description": "Торговый код базового актива"
+                      },
+                      "asset_type": {
+                        "allOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "commodity",
+                              "currency",
+                              "futures",
+                              "index",
+                              "share"
+                            ],
+                            "title": "AssetType",
+                            "description": "Тип базового актива"
+                          }
+                        ],
+                        "description": "Тип базового актива"
+                      },
+                      "futures_code": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Futures Code",
+                        "description": "Код фьючерса, если применимо",
+                        "examples": [
+                          "XXXXXXXXXXXX"
+                        ]
+                      },
+                      "expiration_date": {
+                        "type": "string",
+                        "format": "date",
+                        "title": "Expiration Date",
+                        "description": "Дата исполнения",
+                        "examples": [
+                          "YYYY-MM-DD"
+                        ]
+                      },
+                      "series_type": {
+                        "allOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "W",
+                              "M",
+                              "Q"
+                            ],
+                            "title": "OptionSeriesType",
+                            "description": "Тип серии опциона"
+                          }
+                        ],
+                        "description": "Вид серии опционов"
+                      },
+                      "strike": {
+                        "type": "number",
+                        "title": "Strike",
+                        "description": "Cтрайк",
+                        "examples": [
+                          -123456.123
+                        ]
+                      },
+                      "option_type": {
+                        "allOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "call",
+                              "put"
+                            ],
+                            "title": "OptionType",
+                            "description": "Тип опциона"
+                          }
+                        ],
+                        "description": "Тип опциона (call, put)"
+                      }
+                    },
+                    "type": "object",
+                    "required": [
+                      "secid",
+                      "asset_code",
+                      "asset_type",
+                      "expiration_date",
+                      "series_type",
+                      "strike",
+                      "option_type"
+                    ],
+                    "title": "Option",
+                    "description": "Опцион"
+                  },
+                  "type": "array",
+                  "title": "Response All Options Assets  Asset Code  Options Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{asset_code}/options/{secid}": {
+      "get": {
+        "tags": [
+          "Опционы"
+        ],
+        "summary": "Краткая сводка по опциону",
+        "operationId": "brief_assets__asset_code__options__secid__get",
+        "parameters": [
+          {
+            "description": "Торговый код БА",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 12,
+              "title": "Asset Code",
+              "description": "Торговый код БА"
+            },
+            "name": "asset_code",
+            "in": "path"
+          },
+          {
+            "description": "Торговый код опциона",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 12,
+              "title": "Secid",
+              "description": "Торговый код опциона"
+            },
+            "name": "secid",
+            "in": "path"
+          },
+          {
+            "description": "Тип базового актива",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "commodity",
+                    "currency",
+                    "futures",
+                    "index",
+                    "share"
+                  ],
+                  "title": "AssetType",
+                  "description": "Тип базового актива"
+                }
+              ],
+              "description": "Тип базового актива"
+            },
+            "name": "asset_type",
+            "in": "query"
+          },
+          {
+            "description": "Дней до исполнения",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "title": "Days Until Expiring",
+              "description": "Дней до исполнения"
+            },
+            "name": "days_until_expiring",
+            "in": "query"
+          },
+          {
+            "description": "Цена базового актива, рублей",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Underlying Price",
+              "description": "Цена базового актива, рублей"
+            },
+            "name": "underlying_price",
+            "in": "query"
+          },
+          {
+            "description": "Волатильность IV, процентов",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "title": "Volatility",
+              "description": "Волатильность IV, процентов"
+            },
+            "name": "volatility",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Краткая сводка по опциону",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "delta": {
+                      "type": "number",
+                      "title": "Delta",
+                      "description": "Дельта, пунктов",
+                      "examples": [
+                        -1234567890.123456
+                      ]
+                    },
+                    "gamma": {
+                      "type": "number",
+                      "title": "Gamma",
+                      "description": "Гамма, пунктов",
+                      "examples": [
+                        -1234567890.123456
+                      ]
+                    },
+                    "vega": {
+                      "type": "number",
+                      "title": "Vega",
+                      "description": "Вега, пунктов",
+                      "examples": [
+                        -1234567890.123456
+                      ]
+                    },
+                    "theta": {
+                      "type": "number",
+                      "title": "Theta",
+                      "description": "Тета, пунктов",
+                      "examples": [
+                        -1234567890.123456
+                      ]
+                    },
+                    "rho": {
+                      "type": "number",
+                      "title": "Rho",
+                      "description": "Ро, пунктов",
+                      "examples": [
+                        -1234567890.123456
+                      ]
+                    },
+                    "secid": {
+                      "type": "string",
+                      "maxLength": 12,
+                      "title": "Secid",
+                      "description": "Торговый код опциона",
+                      "examples": [
+                        "XXXXXXXXXXXX"
+                      ]
+                    },
+                    "days_until_expiring": {
+                      "type": "integer",
+                      "title": "Days Until Expiring",
+                      "description": "Дней до исполнения",
+                      "examples": [
+                        123456
+                      ]
+                    },
+                    "underlying_price": {
+                      "type": "number",
+                      "title": "Underlying Price",
+                      "description": "Цена БА, пунктов",
+                      "examples": [
+                        123456.12
+                      ]
+                    },
+                    "volatility": {
+                      "type": "number",
+                      "title": "Volatility",
+                      "description": "Волатильность, процентов",
+                      "examples": [
+                        123456.12
+                      ]
+                    },
+                    "underlying_asset": {
+                      "type": "string",
+                      "maxLength": 36,
+                      "title": "Underlying Asset",
+                      "description": "Базовый актив"
+                    },
+                    "underlying_type": {
+                      "allOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "commodity",
+                            "currency",
+                            "futures",
+                            "index",
+                            "share"
+                          ],
+                          "title": "AssetType",
+                          "description": "Тип базового актива"
+                        }
+                      ],
+                      "description": "Тип базового актива"
+                    },
+                    "theorprice": {
+                      "type": "number",
+                      "title": "Theorprice",
+                      "description": "Теор цена, пунктов",
+                      "examples": [
+                        123456.123456
+                      ]
+                    },
+                    "fee": {
+                      "type": "number",
+                      "title": "Fee",
+                      "description": "Комиссия, руб",
+                      "examples": [
+                        -1234567890.12
+                      ]
+                    },
+                    "expiring_date": {
+                      "type": "string",
+                      "format": "date",
+                      "title": "Expiring Date",
+                      "description": "Дата исполнения опциона, формат YYYY-MM-DD",
+                      "examples": [
+                        "YYYY-MM-DD"
+                      ]
+                    },
+                    "lastprice": {
+                      "type": "number",
+                      "title": "Lastprice",
+                      "description": "Последняя цена базового актива, руб",
+                      "examples": [
+                        123456.12
+                      ]
+                    },
+                    "settleprice": {
+                      "type": "number",
+                      "title": "Settleprice",
+                      "description": "Расчетная цена БА, руб",
+                      "examples": [
+                        123456.12
+                      ]
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "secid",
+                    "days_until_expiring",
+                    "underlying_price",
+                    "volatility",
+                    "underlying_asset",
+                    "underlying_type",
+                    "theorprice",
+                    "expiring_date",
+                    "lastprice",
+                    "settleprice"
+                  ],
+                  "title": "OptionBrief",
+                  "description": "Расчетные параметры для выбранного опциона"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{asset_code}/optionseries": {
+      "get": {
+        "tags": [
+          "Опционы"
+        ],
+        "summary": "Серии опционов на БА",
+        "operationId": "all_option_series_assets__asset_code__optionseries_get",
+        "parameters": [
+          {
+            "description": "Торговый код БА",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 12,
+              "title": "Asset Code",
+              "description": "Торговый код БА"
+            },
+            "name": "asset_code",
+            "in": "path"
+          },
+          {
+            "description": "Тип базового актива",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "commodity",
+                    "currency",
+                    "futures",
+                    "index",
+                    "share"
+                  ],
+                  "title": "AssetType",
+                  "description": "Тип базового актива"
+                }
+              ],
+              "description": "Тип базового актива"
+            },
+            "name": "asset_type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список серий опционов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "optionseries_code": {
+                        "type": "string",
+                        "maxLength": 32,
+                        "title": "Optionseries Code",
+                        "description": "Код серии опциона",
+                        "examples": [
+                          "XXXXXXXXXXXX"
+                        ]
+                      },
+                      "asset_code": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Asset Code",
+                        "description": "Торговый код базового актива",
+                        "examples": [
+                          "XXXXXXXXXXXX"
+                        ]
+                      },
+                      "asset_type": {
+                        "allOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "commodity",
+                              "currency",
+                              "futures",
+                              "index",
+                              "share"
+                            ],
+                            "title": "AssetType",
+                            "description": "Тип базового актива"
+                          }
+                        ],
+                        "description": "Тип базового актива"
+                      },
+                      "futures_code": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Futures Code",
+                        "description": "Код фьючерса, если применимо",
+                        "examples": [
+                          "XXXXXXXXXXXX"
+                        ]
+                      },
+                      "series_type": {
+                        "allOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "W",
+                              "M",
+                              "Q"
+                            ],
+                            "title": "OptionSeriesType",
+                            "description": "Тип серии опциона"
+                          }
+                        ],
+                        "description": "Вид серии опционов"
+                      },
+                      "expiration_date": {
+                        "type": "string",
+                        "format": "date",
+                        "title": "Expiration Date",
+                        "description": "Дата погашения",
+                        "examples": [
+                          "YYYY-MM-DD"
+                        ]
+                      },
+                      "central_strike": {
+                        "type": "number",
+                        "title": "Central Strike",
+                        "description": "Центральный страйк",
+                        "examples": [
+                          123456.123456
+                        ]
+                      },
+                      "call": {
+                        "allOf": [
+                          {
+                            "properties": {
+                              "volume_rub": {
+                                "type": "number",
+                                "title": "Volume Rub",
+                                "description": "Объем в рублях",
+                                "default": 0,
+                                "examples": [
+                                  123456.12
+                                ]
+                              },
+                              "volume_contracts": {
+                                "type": "integer",
+                                "title": "Volume Contracts",
+                                "description": "Объем контрактов",
+                                "default": 0,
+                                "examples": [
+                                  123456
+                                ]
+                              },
+                              "openposition": {
+                                "type": "integer",
+                                "title": "Openposition",
+                                "description": "Число открытых позиций",
+                                "default": 0,
+                                "examples": [
+                                  123456
+                                ]
+                              },
+                              "oichange": {
+                                "type": "integer",
+                                "title": "Oichange",
+                                "description": "Изменение числа открытых позиций",
+                                "default": 0,
+                                "examples": [
+                                  123456
+                                ]
+                              }
+                            },
+                            "type": "object",
+                            "title": "OptionSeriesTotals",
+                            "description": "Суммарные показатели"
+                          }
+                        ],
+                        "title": "Call",
+                        "description": "Суммарно для call-опционов"
+                      },
+                      "put": {
+                        "allOf": [
+                          {
+                            "properties": {
+                              "volume_rub": {
+                                "type": "number",
+                                "title": "Volume Rub",
+                                "description": "Объем в рублях",
+                                "default": 0,
+                                "examples": [
+                                  123456.12
+                                ]
+                              },
+                              "volume_contracts": {
+                                "type": "integer",
+                                "title": "Volume Contracts",
+                                "description": "Объем контрактов",
+                                "default": 0,
+                                "examples": [
+                                  123456
+                                ]
+                              },
+                              "openposition": {
+                                "type": "integer",
+                                "title": "Openposition",
+                                "description": "Число открытых позиций",
+                                "default": 0,
+                                "examples": [
+                                  123456
+                                ]
+                              },
+                              "oichange": {
+                                "type": "integer",
+                                "title": "Oichange",
+                                "description": "Изменение числа открытых позиций",
+                                "default": 0,
+                                "examples": [
+                                  123456
+                                ]
+                              }
+                            },
+                            "type": "object",
+                            "title": "OptionSeriesTotals",
+                            "description": "Суммарные показатели"
+                          }
+                        ],
+                        "title": "Put",
+                        "description": "Суммарно для put-опционов"
+                      },
+                      "updatetime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Updatetime",
+                        "description": "Время обновления информации"
+                      }
+                    },
+                    "type": "object",
+                    "required": [
+                      "optionseries_code",
+                      "asset_code",
+                      "asset_type",
+                      "series_type",
+                      "expiration_date",
+                      "central_strike"
+                    ],
+                    "title": "OptionSeries",
+                    "description": "Серия опциона с сумарными показателями по входящим в серию опционам"
+                  },
+                  "type": "array",
+                  "title": "Response All Option Series Assets  Asset Code  Optionseries Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{asset_code}/optionseries/{optionseries_code}": {
+      "get": {
+        "tags": [
+          "Опционы"
+        ],
+        "summary": "Описание серии опционов на БА",
+        "operationId": "option_series_assets__asset_code__optionseries__optionseries_code__get",
+        "parameters": [
+          {
+            "description": "Торговый код БА",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 12,
+              "title": "Asset Code",
+              "description": "Торговый код БА"
+            },
+            "name": "asset_code",
+            "in": "path"
+          },
+          {
+            "description": "Код серии опционов",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 32,
+              "title": "Optionseries Code",
+              "description": "Код серии опционов"
+            },
+            "name": "optionseries_code",
+            "in": "path"
+          },
+          {
+            "description": "Тип базового актива",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "commodity",
+                    "currency",
+                    "futures",
+                    "index",
+                    "share"
+                  ],
+                  "title": "AssetType",
+                  "description": "Тип базового актива"
+                }
+              ],
+              "description": "Тип базового актива"
+            },
+            "name": "asset_type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Описание серии опционов на БА",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "optionseries_code": {
+                      "type": "string",
+                      "maxLength": 32,
+                      "title": "Optionseries Code",
+                      "description": "Код серии опциона",
+                      "examples": [
+                        "XXXXXXXXXXXX"
+                      ]
+                    },
+                    "asset_code": {
+                      "type": "string",
+                      "maxLength": 12,
+                      "title": "Asset Code",
+                      "description": "Торговый код базового актива",
+                      "examples": [
+                        "XXXXXXXXXXXX"
+                      ]
+                    },
+                    "asset_type": {
+                      "allOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "commodity",
+                            "currency",
+                            "futures",
+                            "index",
+                            "share"
+                          ],
+                          "title": "AssetType",
+                          "description": "Тип базового актива"
+                        }
+                      ],
+                      "description": "Тип базового актива"
+                    },
+                    "futures_code": {
+                      "type": "string",
+                      "maxLength": 12,
+                      "title": "Futures Code",
+                      "description": "Код фьючерса, если применимо",
+                      "examples": [
+                        "XXXXXXXXXXXX"
+                      ]
+                    },
+                    "series_type": {
+                      "allOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "W",
+                            "M",
+                            "Q"
+                          ],
+                          "title": "OptionSeriesType",
+                          "description": "Тип серии опциона"
+                        }
+                      ],
+                      "description": "Вид серии опционов"
+                    },
+                    "expiration_date": {
+                      "type": "string",
+                      "format": "date",
+                      "title": "Expiration Date",
+                      "description": "Дата погашения",
+                      "examples": [
+                        "YYYY-MM-DD"
+                      ]
+                    },
+                    "central_strike": {
+                      "type": "number",
+                      "title": "Central Strike",
+                      "description": "Центральный страйк",
+                      "examples": [
+                        123456.123456
+                      ]
+                    },
+                    "call": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "volume_rub": {
+                              "type": "number",
+                              "title": "Volume Rub",
+                              "description": "Объем в рублях",
+                              "default": 0,
+                              "examples": [
+                                123456.12
+                              ]
+                            },
+                            "volume_contracts": {
+                              "type": "integer",
+                              "title": "Volume Contracts",
+                              "description": "Объем контрактов",
+                              "default": 0,
+                              "examples": [
+                                123456
+                              ]
+                            },
+                            "openposition": {
+                              "type": "integer",
+                              "title": "Openposition",
+                              "description": "Число открытых позиций",
+                              "default": 0,
+                              "examples": [
+                                123456
+                              ]
+                            },
+                            "oichange": {
+                              "type": "integer",
+                              "title": "Oichange",
+                              "description": "Изменение числа открытых позиций",
+                              "default": 0,
+                              "examples": [
+                                123456
+                              ]
+                            }
+                          },
+                          "type": "object",
+                          "title": "OptionSeriesTotals",
+                          "description": "Суммарные показатели"
+                        }
+                      ],
+                      "title": "Call",
+                      "description": "Суммарно для call-опционов"
+                    },
+                    "put": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "volume_rub": {
+                              "type": "number",
+                              "title": "Volume Rub",
+                              "description": "Объем в рублях",
+                              "default": 0,
+                              "examples": [
+                                123456.12
+                              ]
+                            },
+                            "volume_contracts": {
+                              "type": "integer",
+                              "title": "Volume Contracts",
+                              "description": "Объем контрактов",
+                              "default": 0,
+                              "examples": [
+                                123456
+                              ]
+                            },
+                            "openposition": {
+                              "type": "integer",
+                              "title": "Openposition",
+                              "description": "Число открытых позиций",
+                              "default": 0,
+                              "examples": [
+                                123456
+                              ]
+                            },
+                            "oichange": {
+                              "type": "integer",
+                              "title": "Oichange",
+                              "description": "Изменение числа открытых позиций",
+                              "default": 0,
+                              "examples": [
+                                123456
+                              ]
+                            }
+                          },
+                          "type": "object",
+                          "title": "OptionSeriesTotals",
+                          "description": "Суммарные показатели"
+                        }
+                      ],
+                      "title": "Put",
+                      "description": "Суммарно для put-опционов"
+                    },
+                    "updatetime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "title": "Updatetime",
+                      "description": "Время обновления информации"
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "optionseries_code",
+                    "asset_code",
+                    "asset_type",
+                    "series_type",
+                    "expiration_date",
+                    "central_strike"
+                  ],
+                  "title": "OptionSeries",
+                  "description": "Серия опциона с сумарными показателями по входящим в серию опционам"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{asset_code}/optionseries/{optionseries_code}/options": {
+      "get": {
+        "tags": [
+          "Опционы"
+        ],
+        "summary": "Список опционов в серии опционов",
+        "description": "Список опционов в серии опционов",
+        "operationId": "options_assets__asset_code__optionseries__optionseries_code__options_get",
+        "parameters": [
+          {
+            "description": "Торговый код БА",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 12,
+              "title": "Asset Code",
+              "description": "Торговый код БА"
+            },
+            "name": "asset_code",
+            "in": "path"
+          },
+          {
+            "description": "Код серии опционов",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 32,
+              "title": "Optionseries Code",
+              "description": "Код серии опционов"
+            },
+            "name": "optionseries_code",
+            "in": "path"
+          },
+          {
+            "description": "Тип базового актива",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "commodity",
+                    "currency",
+                    "futures",
+                    "index",
+                    "share"
+                  ],
+                  "title": "AssetType",
+                  "description": "Тип базового актива"
+                }
+              ],
+              "description": "Тип базового актива"
+            },
+            "name": "asset_type",
+            "in": "query"
+          },
+          {
+            "description": "Cтрайк",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "title": "Strike",
+              "description": "Cтрайк"
+            },
+            "name": "strike",
+            "in": "query"
+          },
+          {
+            "description": "Тип опциона (call, put)",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "call",
+                    "put"
+                  ],
+                  "title": "OptionType",
+                  "description": "Тип опциона"
+                }
+              ],
+              "description": "Тип опциона (call, put)"
+            },
+            "name": "option_type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "secid": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Secid",
+                        "description": "Торговый код опциона",
+                        "examples": [
+                          "XXXXXXXXXXXX"
+                        ]
+                      },
+                      "asset_code": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Asset Code",
+                        "description": "Торговый код базового актива"
+                      },
+                      "asset_type": {
+                        "allOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "commodity",
+                              "currency",
+                              "futures",
+                              "index",
+                              "share"
+                            ],
+                            "title": "AssetType",
+                            "description": "Тип базового актива"
+                          }
+                        ],
+                        "description": "Тип базового актива"
+                      },
+                      "futures_code": {
+                        "type": "string",
+                        "maxLength": 12,
+                        "title": "Futures Code",
+                        "description": "Код фьючерса, если применимо",
+                        "examples": [
+                          "XXXXXXXXXXXX"
+                        ]
+                      },
+                      "expiration_date": {
+                        "type": "string",
+                        "format": "date",
+                        "title": "Expiration Date",
+                        "description": "Дата исполнения",
+                        "examples": [
+                          "YYYY-MM-DD"
+                        ]
+                      },
+                      "series_type": {
+                        "allOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "W",
+                              "M",
+                              "Q"
+                            ],
+                            "title": "OptionSeriesType",
+                            "description": "Тип серии опциона"
+                          }
+                        ],
+                        "description": "Вид серии опционов"
+                      },
+                      "strike": {
+                        "type": "number",
+                        "title": "Strike",
+                        "description": "Cтрайк",
+                        "examples": [
+                          -123456.123
+                        ]
+                      },
+                      "option_type": {
+                        "allOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "call",
+                              "put"
+                            ],
+                            "title": "OptionType",
+                            "description": "Тип опциона"
+                          }
+                        ],
+                        "description": "Тип опциона (call, put)"
+                      }
+                    },
+                    "type": "object",
+                    "required": [
+                      "secid",
+                      "asset_code",
+                      "asset_type",
+                      "expiration_date",
+                      "series_type",
+                      "strike",
+                      "option_type"
+                    ],
+                    "title": "Option",
+                    "description": "Опцион"
+                  },
+                  "type": "array",
+                  "title": "Response Options Assets  Asset Code  Optionseries  Optionseries Code  Options Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{asset_code}/optionseries/{optionseries_code}/optionboard": {
+      "get": {
+        "tags": [
+          "Опционы"
+        ],
+        "summary": "Доска опционов",
+        "operationId": "optionboard_assets__asset_code__optionseries__optionseries_code__optionboard_get",
+        "parameters": [
+          {
+            "description": "Торговый код БА",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 12,
+              "title": "Asset Code",
+              "description": "Торговый код БА"
+            },
+            "name": "asset_code",
+            "in": "path"
+          },
+          {
+            "description": "Код серии опционов",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 32,
+              "title": "Optionseries Code",
+              "description": "Код серии опционов"
+            },
+            "name": "optionseries_code",
+            "in": "path"
+          },
+          {
+            "description": "Тип базового актива",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "commodity",
+                    "currency",
+                    "futures",
+                    "index",
+                    "share"
+                  ],
+                  "title": "AssetType",
+                  "description": "Тип базового актива"
+                }
+              ],
+              "description": "Тип базового актива"
+            },
+            "name": "asset_type",
+            "in": "query"
+          },
+          {
+            "description": "Количество строк от центрального страйка",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "title": "Rows",
+              "description": "Количество строк от центрального страйка"
+            },
+            "name": "rows",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Доска опционов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "call": {
+                      "items": {
+                        "properties": {
+                          "delta": {
+                            "type": "number",
+                            "title": "Delta",
+                            "description": "Дельта, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "gamma": {
+                            "type": "number",
+                            "title": "Gamma",
+                            "description": "Гамма, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "vega": {
+                            "type": "number",
+                            "title": "Vega",
+                            "description": "Вега, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "theta": {
+                            "type": "number",
+                            "title": "Theta",
+                            "description": "Тета, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "rho": {
+                            "type": "number",
+                            "title": "Rho",
+                            "description": "Ро, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "secid": {
+                            "type": "string",
+                            "maxLength": 12,
+                            "title": "Secid",
+                            "description": "Торговый код опциона",
+                            "examples": [
+                              "XXXXXXXXXXXX"
+                            ]
+                          },
+                          "theorprice": {
+                            "type": "number",
+                            "title": "Theorprice",
+                            "description": "Теоретическая цена опциона, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "theorprice_rub": {
+                            "type": "number",
+                            "title": "Theorprice Rub",
+                            "description": "Теоретическая цена опциона, руб",
+                            "examples": [
+                              -1234567890.12
+                            ]
+                          },
+                          "last": {
+                            "type": "number",
+                            "title": "Last",
+                            "description": "Последняя цена, пунктов",
+                            "examples": [
+                              123456.123456
+                            ]
+                          },
+                          "offer": {
+                            "type": "number",
+                            "title": "Offer",
+                            "description": "Предложение, пунктов, руб",
+                            "examples": [
+                              123456.12
+                            ]
+                          },
+                          "bid": {
+                            "type": "number",
+                            "title": "Bid",
+                            "description": "Спрос, пунктов, руб",
+                            "examples": [
+                              123456.12
+                            ]
+                          },
+                          "numtrades": {
+                            "type": "integer",
+                            "title": "Numtrades",
+                            "description": "Количество сделок",
+                            "examples": [
+                              123456
+                            ]
+                          },
+                          "strike": {
+                            "type": "number",
+                            "title": "Strike",
+                            "description": "Страйк, пунктов",
+                            "examples": [
+                              123456.123
+                            ]
+                          },
+                          "volatility": {
+                            "type": "number",
+                            "title": "Volatility",
+                            "description": "Волатильность, процентов",
+                            "examples": [
+                              -1234567890.12
+                            ]
+                          },
+                          "intrinsic_value": {
+                            "type": "number",
+                            "title": "Intrinsic Value",
+                            "description": "Внутренняя стоимость, пунктов",
+                            "examples": [
+                              -1234567890.12
+                            ]
+                          },
+                          "timed_value": {
+                            "type": "number",
+                            "title": "Timed Value",
+                            "description": "ВременнАя стоимость, пунктов",
+                            "examples": [
+                              -1234567890.12
+                            ]
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "secid",
+                          "strike"
+                        ],
+                        "title": "OptionBoardRow",
+                        "description": "Опцион с индикаторами"
+                      },
+                      "type": "array",
+                      "title": "Call",
+                      "description": "Опционы на покупку"
+                    },
+                    "put": {
+                      "items": {
+                        "properties": {
+                          "delta": {
+                            "type": "number",
+                            "title": "Delta",
+                            "description": "Дельта, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "gamma": {
+                            "type": "number",
+                            "title": "Gamma",
+                            "description": "Гамма, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "vega": {
+                            "type": "number",
+                            "title": "Vega",
+                            "description": "Вега, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "theta": {
+                            "type": "number",
+                            "title": "Theta",
+                            "description": "Тета, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "rho": {
+                            "type": "number",
+                            "title": "Rho",
+                            "description": "Ро, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "secid": {
+                            "type": "string",
+                            "maxLength": 12,
+                            "title": "Secid",
+                            "description": "Торговый код опциона",
+                            "examples": [
+                              "XXXXXXXXXXXX"
+                            ]
+                          },
+                          "theorprice": {
+                            "type": "number",
+                            "title": "Theorprice",
+                            "description": "Теоретическая цена опциона, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "theorprice_rub": {
+                            "type": "number",
+                            "title": "Theorprice Rub",
+                            "description": "Теоретическая цена опциона, руб",
+                            "examples": [
+                              -1234567890.12
+                            ]
+                          },
+                          "last": {
+                            "type": "number",
+                            "title": "Last",
+                            "description": "Последняя цена, пунктов",
+                            "examples": [
+                              123456.123456
+                            ]
+                          },
+                          "offer": {
+                            "type": "number",
+                            "title": "Offer",
+                            "description": "Предложение, пунктов, руб",
+                            "examples": [
+                              123456.12
+                            ]
+                          },
+                          "bid": {
+                            "type": "number",
+                            "title": "Bid",
+                            "description": "Спрос, пунктов, руб",
+                            "examples": [
+                              123456.12
+                            ]
+                          },
+                          "numtrades": {
+                            "type": "integer",
+                            "title": "Numtrades",
+                            "description": "Количество сделок",
+                            "examples": [
+                              123456
+                            ]
+                          },
+                          "strike": {
+                            "type": "number",
+                            "title": "Strike",
+                            "description": "Страйк, пунктов",
+                            "examples": [
+                              123456.123
+                            ]
+                          },
+                          "volatility": {
+                            "type": "number",
+                            "title": "Volatility",
+                            "description": "Волатильность, процентов",
+                            "examples": [
+                              -1234567890.12
+                            ]
+                          },
+                          "intrinsic_value": {
+                            "type": "number",
+                            "title": "Intrinsic Value",
+                            "description": "Внутренняя стоимость, пунктов",
+                            "examples": [
+                              -1234567890.12
+                            ]
+                          },
+                          "timed_value": {
+                            "type": "number",
+                            "title": "Timed Value",
+                            "description": "ВременнАя стоимость, пунктов",
+                            "examples": [
+                              -1234567890.12
+                            ]
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "secid",
+                          "strike"
+                        ],
+                        "title": "OptionBoardRow",
+                        "description": "Опцион с индикаторами"
+                      },
+                      "type": "array",
+                      "title": "Put",
+                      "description": "Опционы на продажу"
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "call",
+                    "put"
+                  ],
+                  "title": "OptionBoard",
+                  "description": "Доска опционов"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{asset_code}/optionseries/{optionseries_code}/volatility_graph": {
+      "get": {
+        "tags": [
+          "Опционы"
+        ],
+        "summary": "График волатильности",
+        "operationId": "volatility_graph_assets__asset_code__optionseries__optionseries_code__volatility_graph_get",
+        "parameters": [
+          {
+            "description": "Торговый код БА",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 12,
+              "title": "Asset Code",
+              "description": "Торговый код БА"
+            },
+            "name": "asset_code",
+            "in": "path"
+          },
+          {
+            "description": "Код серии опционов",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 32,
+              "title": "Optionseries Code",
+              "description": "Код серии опционов"
+            },
+            "name": "optionseries_code",
+            "in": "path"
+          },
+          {
+            "description": "Тип базового актива",
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "commodity",
+                    "currency",
+                    "futures",
+                    "index",
+                    "share"
+                  ],
+                  "title": "AssetType",
+                  "description": "Тип базового актива"
+                }
+              ],
+              "description": "Тип базового актива"
+            },
+            "name": "asset_type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "График волатильности",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "strike": {
+                        "type": "number",
+                        "title": "Strike",
+                        "description": "Страйк, пунктов",
+                        "examples": [
+                          123456.123
+                        ]
+                      },
+                      "volatility": {
+                        "type": "number",
+                        "title": "Volatility",
+                        "description": "Волатильность, процентов",
+                        "examples": [
+                          123456.12
+                        ]
+                      }
+                    },
+                    "type": "object",
+                    "required": [
+                      "strike",
+                      "volatility"
+                    ],
+                    "title": "VolatilityGraphPoint",
+                    "description": "Точка на графике волатильности"
+                  },
+                  "type": "array",
+                  "title": "Response Volatility Graph Assets  Asset Code  Optionseries  Optionseries Code  Volatility Graph Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/portfolio/": {
+      "post": {
+        "tags": [
+          "Портфель"
+        ],
+        "summary": "Расчёт портфеля",
+        "description": "Расчет портфеля опционов",
+        "operationId": "portfolio_portfolio__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "asset_code": {
+                    "type": "string",
+                    "maxLength": 12,
+                    "title": "Asset Code",
+                    "description": "Торговый код базового актива"
+                  },
+                  "asset_type": {
+                    "allOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "commodity",
+                          "currency",
+                          "futures",
+                          "index",
+                          "share"
+                        ],
+                        "title": "AssetType",
+                        "description": "Тип базового актива"
+                      }
+                    ],
+                    "description": "Тип базового актива"
+                  },
+                  "positions": {
+                    "items": {
+                      "properties": {
+                        "secid": {
+                          "type": "string",
+                          "maxLength": 12,
+                          "title": "Secid",
+                          "description": "Торговый код",
+                          "examples": [
+                            "XXXXXXXXXXXX"
+                          ]
+                        },
+                        "type": {
+                          "allOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "currency",
+                                "commodity",
+                                "futures",
+                                "option",
+                                "share"
+                              ],
+                              "title": "SimulatedPositionType",
+                              "description": "Вид тикера в моделируемой позиции"
+                            }
+                          ],
+                          "description": "Вид торгового инструмента"
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "title": "Quantity",
+                          "description": "Количество покупки (отрицательное число - продажа)",
+                          "examples": [
+                            -123456
+                          ]
+                        },
+                        "price": {
+                          "type": "number",
+                          "title": "Price",
+                          "description": "Цена покупки",
+                          "examples": [
+                            123456.123456
+                          ]
+                        },
+                        "volatility": {
+                          "type": "number",
+                          "title": "Volatility",
+                          "description": "Волатильность, процентов",
+                          "examples": [
+                            1234.12
+                          ],
+                          "gte": 0
+                        },
+                        "netted_im": {
+                          "type": "boolean",
+                          "title": "Netted Im",
+                          "description": "Признак неттирования гарантийного обеспечения",
+                          "default": true
+                        }
+                      },
+                      "type": "object",
+                      "required": [
+                        "secid",
+                        "quantity"
+                      ],
+                      "title": "SimulatedPosition",
+                      "description": "Моделируемая позиция"
+                    },
+                    "type": "array",
+                    "title": "Positions",
+                    "description": "Моделируемые позиции"
+                  },
+                  "what_if": {
+                    "allOf": [
+                      {
+                        "properties": {
+                          "delta_sigma": {
+                            "type": "number",
+                            "title": "Delta Sigma",
+                            "description": "Смещение волатильности, процентов",
+                            "examples": [
+                              -12.12
+                            ],
+                            "gte": -100
+                          },
+                          "date_of_calculation": {
+                            "type": "string",
+                            "format": "date",
+                            "title": "Date Of Calculation",
+                            "description": "Дата рассчета",
+                            "examples": [
+                              "YYYY-MM-DD"
+                            ]
+                          }
+                        },
+                        "type": "object",
+                        "title": "WhatIfCondition",
+                        "description": "Условие 'что если'"
+                      }
+                    ],
+                    "title": "What If",
+                    "description": "Условие \"что если\""
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "asset_code",
+                  "positions"
+                ],
+                "title": "OptionPortfolio",
+                "description": "Опционный портфель"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "positions": {
+                      "items": {
+                        "properties": {
+                          "delta": {
+                            "type": "number",
+                            "title": "Delta",
+                            "description": "Дельта, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "gamma": {
+                            "type": "number",
+                            "title": "Gamma",
+                            "description": "Гамма, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "vega": {
+                            "type": "number",
+                            "title": "Vega",
+                            "description": "Вега, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "theta": {
+                            "type": "number",
+                            "title": "Theta",
+                            "description": "Тета, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "rho": {
+                            "type": "number",
+                            "title": "Rho",
+                            "description": "Ро, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "profit_and_loss": {
+                            "type": "number",
+                            "title": "Profit And Loss",
+                            "description": "Прибыль/убыток, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "profit_and_loss_rub": {
+                            "type": "number",
+                            "title": "Profit And Loss Rub",
+                            "description": "Прибыль/убыток, руб",
+                            "examples": [
+                              -1234567890.12
+                            ]
+                          },
+                          "fee": {
+                            "type": "number",
+                            "title": "Fee",
+                            "description": "Комиссия, руб",
+                            "examples": [
+                              -1234567890.12
+                            ]
+                          },
+                          "secid": {
+                            "type": "string",
+                            "maxLength": 12,
+                            "title": "Secid",
+                            "description": "Торговый код опциона",
+                            "examples": [
+                              "XXXXXXXXXXXX"
+                            ]
+                          },
+                          "type": {
+                            "allOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "currency",
+                                  "commodity",
+                                  "futures",
+                                  "option",
+                                  "share"
+                                ],
+                                "title": "SimulatedPositionType",
+                                "description": "Вид тикера в моделируемой позиции"
+                              }
+                            ],
+                            "description": "Вид торгового инструмента"
+                          },
+                          "quantity": {
+                            "type": "integer",
+                            "title": "Quantity",
+                            "description": "Количество покупки (отрицательное число - продажа)",
+                            "examples": [
+                              -123456
+                            ]
+                          },
+                          "price": {
+                            "type": "number",
+                            "title": "Price",
+                            "description": "Цена покупки",
+                            "examples": [
+                              -123456.123456
+                            ]
+                          },
+                          "volatility": {
+                            "type": "number",
+                            "title": "Volatility",
+                            "description": "Волатильность, процентов",
+                            "examples": [
+                              123456.12
+                            ]
+                          },
+                          "strike": {
+                            "type": "number",
+                            "title": "Strike",
+                            "description": "Cтрайк",
+                            "examples": [
+                              -123456.123
+                            ]
+                          },
+                          "expiration_date": {
+                            "type": "string",
+                            "format": "date",
+                            "title": "Expiration Date",
+                            "description": "Дата погашения",
+                            "examples": [
+                              "YYYY-MM-DD"
+                            ]
+                          },
+                          "days_until_expiring": {
+                            "type": "integer",
+                            "title": "Days Until Expiring",
+                            "description": "Дней до экспирации",
+                            "examples": [
+                              1234
+                            ]
+                          },
+                          "theorprice": {
+                            "type": "number",
+                            "title": "Theorprice",
+                            "description": "Теор цена, пунктов",
+                            "examples": [
+                              -1234567890.123456
+                            ]
+                          },
+                          "expired": {
+                            "type": "boolean",
+                            "title": "Expired",
+                            "description": "Признак экспирации фьючерса/опциона"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "secid",
+                          "type",
+                          "quantity"
+                        ],
+                        "title": "CalculatedPosition",
+                        "description": "Рассчитанные показатели"
+                      },
+                      "type": "array",
+                      "title": "Positions",
+                      "description": "Рассчитанные позиции"
+                    },
+                    "total": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "delta": {
+                              "type": "number",
+                              "title": "Delta",
+                              "description": "Дельта, пунктов",
+                              "examples": [
+                                -1234567890.123456
+                              ]
+                            },
+                            "gamma": {
+                              "type": "number",
+                              "title": "Gamma",
+                              "description": "Гамма, пунктов",
+                              "examples": [
+                                -1234567890.123456
+                              ]
+                            },
+                            "vega": {
+                              "type": "number",
+                              "title": "Vega",
+                              "description": "Вега, пунктов",
+                              "examples": [
+                                -1234567890.123456
+                              ]
+                            },
+                            "theta": {
+                              "type": "number",
+                              "title": "Theta",
+                              "description": "Тета, пунктов",
+                              "examples": [
+                                -1234567890.123456
+                              ]
+                            },
+                            "rho": {
+                              "type": "number",
+                              "title": "Rho",
+                              "description": "Ро, пунктов",
+                              "examples": [
+                                -1234567890.123456
+                              ]
+                            },
+                            "profit_and_loss": {
+                              "type": "number",
+                              "title": "Profit And Loss",
+                              "description": "Прибыль/убыток, пунктов",
+                              "examples": [
+                                -1234567890.123456
+                              ]
+                            },
+                            "profit_and_loss_rub": {
+                              "type": "number",
+                              "title": "Profit And Loss Rub",
+                              "description": "Прибыль/убыток, руб",
+                              "examples": [
+                                -1234567890.12
+                              ]
+                            },
+                            "fee": {
+                              "type": "number",
+                              "title": "Fee",
+                              "description": "Комиссия, руб",
+                              "examples": [
+                                -1234567890.12
+                              ]
+                            }
+                          },
+                          "type": "object",
+                          "title": "CalculatedTotal",
+                          "description": "Рассчитанные суммарные показатели"
+                        }
+                      ],
+                      "title": "Total",
+                      "description": "Всего"
+                    },
+                    "initial_margin": {
+                      "type": "number",
+                      "title": "Initial Margin",
+                      "description": " Рассчитанное значение гарантийного обеспечения",
+                      "examples": [
+                        -1234567890.123456
+                      ]
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "positions",
+                    "total"
+                  ],
+                  "title": "CalculatedPortfolio",
+                  "description": "Рассчитанный опционный портфель"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/portfolio/graph/{indicator}": {
+      "post": {
+        "tags": [
+          "Портфель"
+        ],
+        "summary": "Расчёт графика выбранного индикатора",
+        "description": "График по индикатору",
+        "operationId": "graph_portfolio_graph__indicator__post",
+        "parameters": [
+          {
+            "description": "тип графика",
+            "required": true,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "profit_and_loss",
+                    "delta",
+                    "gamma",
+                    "vega",
+                    "theta",
+                    "rho"
+                  ],
+                  "title": "IndicatorType",
+                  "description": "Вид индикатора"
+                }
+              ],
+              "description": "тип графика"
+            },
+            "name": "indicator",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "asset_code": {
+                    "type": "string",
+                    "maxLength": 12,
+                    "title": "Asset Code",
+                    "description": "Торговый код базового актива"
+                  },
+                  "asset_type": {
+                    "allOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "commodity",
+                          "currency",
+                          "futures",
+                          "index",
+                          "share"
+                        ],
+                        "title": "AssetType",
+                        "description": "Тип базового актива"
+                      }
+                    ],
+                    "description": "Тип базового актива"
+                  },
+                  "positions": {
+                    "items": {
+                      "properties": {
+                        "secid": {
+                          "type": "string",
+                          "maxLength": 12,
+                          "title": "Secid",
+                          "description": "Торговый код",
+                          "examples": [
+                            "XXXXXXXXXXXX"
+                          ]
+                        },
+                        "type": {
+                          "allOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "currency",
+                                "commodity",
+                                "futures",
+                                "option",
+                                "share"
+                              ],
+                              "title": "SimulatedPositionType",
+                              "description": "Вид тикера в моделируемой позиции"
+                            }
+                          ],
+                          "description": "Вид торгового инструмента"
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "title": "Quantity",
+                          "description": "Количество покупки (отрицательное число - продажа)",
+                          "examples": [
+                            -123456
+                          ]
+                        },
+                        "price": {
+                          "type": "number",
+                          "title": "Price",
+                          "description": "Цена покупки",
+                          "examples": [
+                            123456.123456
+                          ]
+                        },
+                        "volatility": {
+                          "type": "number",
+                          "title": "Volatility",
+                          "description": "Волатильность, процентов",
+                          "examples": [
+                            1234.12
+                          ],
+                          "gte": 0
+                        },
+                        "netted_im": {
+                          "type": "boolean",
+                          "title": "Netted Im",
+                          "description": "Признак неттирования гарантийного обеспечения",
+                          "default": true
+                        }
+                      },
+                      "type": "object",
+                      "required": [
+                        "secid",
+                        "quantity"
+                      ],
+                      "title": "SimulatedPosition",
+                      "description": "Моделируемая позиция"
+                    },
+                    "type": "array",
+                    "title": "Positions",
+                    "description": "Моделируемые позиции"
+                  },
+                  "what_if": {
+                    "allOf": [
+                      {
+                        "properties": {
+                          "delta_sigma": {
+                            "type": "number",
+                            "title": "Delta Sigma",
+                            "description": "Смещение волатильности, процентов",
+                            "examples": [
+                              -12.12
+                            ],
+                            "gte": -100
+                          },
+                          "date_of_calculation": {
+                            "type": "string",
+                            "format": "date",
+                            "title": "Date Of Calculation",
+                            "description": "Дата рассчета",
+                            "examples": [
+                              "YYYY-MM-DD"
+                            ]
+                          }
+                        },
+                        "type": "object",
+                        "title": "WhatIfCondition",
+                        "description": "Условие 'что если'"
+                      }
+                    ],
+                    "title": "What If",
+                    "description": "Условие \"что если\""
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "asset_code",
+                  "positions"
+                ],
+                "title": "OptionPortfolio",
+                "description": "Опционный портфель"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "now": {
+                      "items": {
+                        "properties": {
+                          "underlying_price": {
+                            "type": "number",
+                            "title": "Underlying Price",
+                            "description": "Цена БА, пунктов",
+                            "examples": [
+                              123456
+                            ]
+                          },
+                          "value": {
+                            "type": "number",
+                            "title": "Value",
+                            "description": "Значение индикатора",
+                            "examples": [
+                              123456.12
+                            ]
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "underlying_price",
+                          "value"
+                        ],
+                        "title": "IndicatorGraphPoint",
+                        "description": "Точка на графике индикатора"
+                      },
+                      "type": "array",
+                      "title": "Now",
+                      "description": "На текущую дату"
+                    },
+                    "on_expiration": {
+                      "items": {
+                        "properties": {
+                          "underlying_price": {
+                            "type": "number",
+                            "title": "Underlying Price",
+                            "description": "Цена БА, пунктов",
+                            "examples": [
+                              123456
+                            ]
+                          },
+                          "value": {
+                            "type": "number",
+                            "title": "Value",
+                            "description": "Значение индикатора",
+                            "examples": [
+                              123456.12
+                            ]
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "underlying_price",
+                          "value"
+                        ],
+                        "title": "IndicatorGraphPoint",
+                        "description": "Точка на графике индикатора"
+                      },
+                      "type": "array",
+                      "title": "On Expiration",
+                      "description": "На дату исполнения"
+                    },
+                    "on_what_if": {
+                      "items": {
+                        "properties": {
+                          "underlying_price": {
+                            "type": "number",
+                            "title": "Underlying Price",
+                            "description": "Цена БА, пунктов",
+                            "examples": [
+                              123456
+                            ]
+                          },
+                          "value": {
+                            "type": "number",
+                            "title": "Value",
+                            "description": "Значение индикатора",
+                            "examples": [
+                              123456.12
+                            ]
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "underlying_price",
+                          "value"
+                        ],
+                        "title": "IndicatorGraphPoint",
+                        "description": "Точка на графике индикатора"
+                      },
+                      "type": "array",
+                      "title": "On What If",
+                      "description": "С условием \"что если\""
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "now",
+                    "on_expiration"
+                  ],
+                  "title": "IndicatorGraph",
+                  "description": "Графики индикатора"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/portfolio/initial_margin": {
+      "post": {
+        "tags": [
+          "Портфель"
+        ],
+        "summary": "Гарантийное обеспечение для произвольного набора позиций",
+        "description": "Рассчет гарантийного обеспечения.\nВ списке позиций можно передавать любой набор кодов опционов и фьючерсов (поле secid) на любой БА.",
+        "operationId": "initial_margin_portfolio_initial_margin_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "properties": {
+                    "secid": {
+                      "type": "string",
+                      "maxLength": 12,
+                      "title": "Secid",
+                      "description": "Торговый код фьючерса или опциона",
+                      "examples": [
+                        "XXXXXXXXXXXX"
+                      ]
+                    },
+                    "quantity": {
+                      "type": "integer",
+                      "title": "Quantity",
+                      "description": "Количество покупки (отрицательное число - продажа)",
+                      "examples": [
+                        -123456
+                      ]
+                    },
+                    "price": {
+                      "type": "number",
+                      "title": "Price",
+                      "description": "Цена покупки",
+                      "examples": [
+                        123456.123456
+                      ]
+                    },
+                    "netted_im": {
+                      "type": "boolean",
+                      "title": "Netted Im",
+                      "description": "Признак неттирования гарантийного обеспечения",
+                      "default": true
+                    }
+                  },
+                  "type": "object",
+                  "required": [
+                    "secid",
+                    "quantity",
+                    "price"
+                  ],
+                  "title": "InitialMarginPosition",
+                  "description": "Позиция для расчета гарантийного обеспечения"
+                },
+                "type": "array",
+                "title": "Positions"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "title": "Response Initial Margin Portfolio Initial Margin Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Asset": {
+        "properties": {
+          "asset_code": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Asset Code",
+            "description": "Торговый код базового актива",
+            "examples": [
+              "ABCDEFGIJKL"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 256,
+            "title": "Title",
+            "description": "Наименование базового актива",
+            "examples": [
+              "Cъешь еще этих мягких французских булок да выпей же чаю"
+            ]
+          },
+          "asset_type": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Asset Type",
+            "description": "Тип базового актива"
+          },
+          "asset_subtype": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Asset Subtype",
+            "description": "Подтип базового актива - фьючерса"
+          }
+        },
+        "type": "object",
+        "required": [
+          "asset_code",
+          "title",
+          "asset_type"
+        ],
+        "title": "Asset",
+        "description": "Базовый актив"
+      },
+      "AssetSubtype": {
+        "type": "string",
+        "enum": [
+          "commodity",
+          "currency",
+          "index",
+          "share"
+        ],
+        "title": "AssetSubtype",
+        "description": "Подтип фьючерса (базового актива)"
+      },
+      "AssetType": {
+        "type": "string",
+        "enum": [
+          "commodity",
+          "currency",
+          "futures",
+          "index",
+          "share"
+        ],
+        "title": "AssetType",
+        "description": "Тип базового актива"
+      },
+      "CalculatedPortfolio": {
+        "properties": {
+          "positions": {
+            "items": {
+              "properties": {
+                "delta": {
+                  "type": "number",
+                  "title": "Delta",
+                  "description": "Дельта, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "gamma": {
+                  "type": "number",
+                  "title": "Gamma",
+                  "description": "Гамма, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "vega": {
+                  "type": "number",
+                  "title": "Vega",
+                  "description": "Вега, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "theta": {
+                  "type": "number",
+                  "title": "Theta",
+                  "description": "Тета, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "rho": {
+                  "type": "number",
+                  "title": "Rho",
+                  "description": "Ро, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "profit_and_loss": {
+                  "type": "number",
+                  "title": "Profit And Loss",
+                  "description": "Прибыль/убыток, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "profit_and_loss_rub": {
+                  "type": "number",
+                  "title": "Profit And Loss Rub",
+                  "description": "Прибыль/убыток, руб",
+                  "examples": [
+                    -1234567890.12
+                  ]
+                },
+                "fee": {
+                  "type": "number",
+                  "title": "Fee",
+                  "description": "Комиссия, руб",
+                  "examples": [
+                    -1234567890.12
+                  ]
+                },
+                "secid": {
+                  "type": "string",
+                  "maxLength": 12,
+                  "title": "Secid",
+                  "description": "Торговый код опциона",
+                  "examples": [
+                    "XXXXXXXXXXXX"
+                  ]
+                },
+                "type": {
+                  "allOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "currency",
+                        "commodity",
+                        "futures",
+                        "option",
+                        "share"
+                      ],
+                      "title": "SimulatedPositionType",
+                      "description": "Вид тикера в моделируемой позиции"
+                    }
+                  ],
+                  "description": "Вид торгового инструмента"
+                },
+                "quantity": {
+                  "type": "integer",
+                  "title": "Quantity",
+                  "description": "Количество покупки (отрицательное число - продажа)",
+                  "examples": [
+                    -123456
+                  ]
+                },
+                "price": {
+                  "type": "number",
+                  "title": "Price",
+                  "description": "Цена покупки",
+                  "examples": [
+                    -123456.123456
+                  ]
+                },
+                "volatility": {
+                  "type": "number",
+                  "title": "Volatility",
+                  "description": "Волатильность, процентов",
+                  "examples": [
+                    123456.12
+                  ]
+                },
+                "strike": {
+                  "type": "number",
+                  "title": "Strike",
+                  "description": "Cтрайк",
+                  "examples": [
+                    -123456.123
+                  ]
+                },
+                "expiration_date": {
+                  "type": "string",
+                  "format": "date",
+                  "title": "Expiration Date",
+                  "description": "Дата погашения",
+                  "examples": [
+                    "YYYY-MM-DD"
+                  ]
+                },
+                "days_until_expiring": {
+                  "type": "integer",
+                  "title": "Days Until Expiring",
+                  "description": "Дней до экспирации",
+                  "examples": [
+                    1234
+                  ]
+                },
+                "theorprice": {
+                  "type": "number",
+                  "title": "Theorprice",
+                  "description": "Теор цена, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "expired": {
+                  "type": "boolean",
+                  "title": "Expired",
+                  "description": "Признак экспирации фьючерса/опциона"
+                }
+              },
+              "type": "object",
+              "required": [
+                "secid",
+                "type",
+                "quantity"
+              ],
+              "title": "CalculatedPosition",
+              "description": "Рассчитанные показатели"
+            },
+            "type": "array",
+            "title": "Positions",
+            "description": "Рассчитанные позиции"
+          },
+          "total": {
+            "allOf": [
+              {
+                "properties": {
+                  "delta": {
+                    "type": "number",
+                    "title": "Delta",
+                    "description": "Дельта, пунктов",
+                    "examples": [
+                      -1234567890.123456
+                    ]
+                  },
+                  "gamma": {
+                    "type": "number",
+                    "title": "Gamma",
+                    "description": "Гамма, пунктов",
+                    "examples": [
+                      -1234567890.123456
+                    ]
+                  },
+                  "vega": {
+                    "type": "number",
+                    "title": "Vega",
+                    "description": "Вега, пунктов",
+                    "examples": [
+                      -1234567890.123456
+                    ]
+                  },
+                  "theta": {
+                    "type": "number",
+                    "title": "Theta",
+                    "description": "Тета, пунктов",
+                    "examples": [
+                      -1234567890.123456
+                    ]
+                  },
+                  "rho": {
+                    "type": "number",
+                    "title": "Rho",
+                    "description": "Ро, пунктов",
+                    "examples": [
+                      -1234567890.123456
+                    ]
+                  },
+                  "profit_and_loss": {
+                    "type": "number",
+                    "title": "Profit And Loss",
+                    "description": "Прибыль/убыток, пунктов",
+                    "examples": [
+                      -1234567890.123456
+                    ]
+                  },
+                  "profit_and_loss_rub": {
+                    "type": "number",
+                    "title": "Profit And Loss Rub",
+                    "description": "Прибыль/убыток, руб",
+                    "examples": [
+                      -1234567890.12
+                    ]
+                  },
+                  "fee": {
+                    "type": "number",
+                    "title": "Fee",
+                    "description": "Комиссия, руб",
+                    "examples": [
+                      -1234567890.12
+                    ]
+                  }
+                },
+                "type": "object",
+                "title": "CalculatedTotal",
+                "description": "Рассчитанные суммарные показатели"
+              }
+            ],
+            "title": "Total",
+            "description": "Всего"
+          },
+          "initial_margin": {
+            "type": "number",
+            "title": "Initial Margin",
+            "description": " Рассчитанное значение гарантийного обеспечения",
+            "examples": [
+              -1234567890.123456
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "positions",
+          "total"
+        ],
+        "title": "CalculatedPortfolio",
+        "description": "Рассчитанный опционный портфель"
+      },
+      "CalculatedPosition": {
+        "properties": {
+          "delta": {
+            "type": "number",
+            "title": "Delta",
+            "description": "Дельта, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "gamma": {
+            "type": "number",
+            "title": "Gamma",
+            "description": "Гамма, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "vega": {
+            "type": "number",
+            "title": "Vega",
+            "description": "Вега, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "theta": {
+            "type": "number",
+            "title": "Theta",
+            "description": "Тета, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "rho": {
+            "type": "number",
+            "title": "Rho",
+            "description": "Ро, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "profit_and_loss": {
+            "type": "number",
+            "title": "Profit And Loss",
+            "description": "Прибыль/убыток, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "profit_and_loss_rub": {
+            "type": "number",
+            "title": "Profit And Loss Rub",
+            "description": "Прибыль/убыток, руб",
+            "examples": [
+              -1234567890.12
+            ]
+          },
+          "fee": {
+            "type": "number",
+            "title": "Fee",
+            "description": "Комиссия, руб",
+            "examples": [
+              -1234567890.12
+            ]
+          },
+          "secid": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Secid",
+            "description": "Торговый код опциона",
+            "examples": [
+              "XXXXXXXXXXXX"
+            ]
+          },
+          "type": {
+            "allOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "currency",
+                  "commodity",
+                  "futures",
+                  "option",
+                  "share"
+                ],
+                "title": "SimulatedPositionType",
+                "description": "Вид тикера в моделируемой позиции"
+              }
+            ],
+            "description": "Вид торгового инструмента"
+          },
+          "quantity": {
+            "type": "integer",
+            "title": "Quantity",
+            "description": "Количество покупки (отрицательное число - продажа)",
+            "examples": [
+              -123456
+            ]
+          },
+          "price": {
+            "type": "number",
+            "title": "Price",
+            "description": "Цена покупки",
+            "examples": [
+              -123456.123456
+            ]
+          },
+          "volatility": {
+            "type": "number",
+            "title": "Volatility",
+            "description": "Волатильность, процентов",
+            "examples": [
+              123456.12
+            ]
+          },
+          "strike": {
+            "type": "number",
+            "title": "Strike",
+            "description": "Cтрайк",
+            "examples": [
+              -123456.123
+            ]
+          },
+          "expiration_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Expiration Date",
+            "description": "Дата погашения",
+            "examples": [
+              "YYYY-MM-DD"
+            ]
+          },
+          "days_until_expiring": {
+            "type": "integer",
+            "title": "Days Until Expiring",
+            "description": "Дней до экспирации",
+            "examples": [
+              1234
+            ]
+          },
+          "theorprice": {
+            "type": "number",
+            "title": "Theorprice",
+            "description": "Теор цена, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "expired": {
+            "type": "boolean",
+            "title": "Expired",
+            "description": "Признак экспирации фьючерса/опциона"
+          }
+        },
+        "type": "object",
+        "required": [
+          "secid",
+          "type",
+          "quantity"
+        ],
+        "title": "CalculatedPosition",
+        "description": "Рассчитанные показатели"
+      },
+      "CalculatedTotal": {
+        "properties": {
+          "delta": {
+            "type": "number",
+            "title": "Delta",
+            "description": "Дельта, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "gamma": {
+            "type": "number",
+            "title": "Gamma",
+            "description": "Гамма, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "vega": {
+            "type": "number",
+            "title": "Vega",
+            "description": "Вега, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "theta": {
+            "type": "number",
+            "title": "Theta",
+            "description": "Тета, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "rho": {
+            "type": "number",
+            "title": "Rho",
+            "description": "Ро, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "profit_and_loss": {
+            "type": "number",
+            "title": "Profit And Loss",
+            "description": "Прибыль/убыток, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "profit_and_loss_rub": {
+            "type": "number",
+            "title": "Profit And Loss Rub",
+            "description": "Прибыль/убыток, руб",
+            "examples": [
+              -1234567890.12
+            ]
+          },
+          "fee": {
+            "type": "number",
+            "title": "Fee",
+            "description": "Комиссия, руб",
+            "examples": [
+              -1234567890.12
+            ]
+          }
+        },
+        "type": "object",
+        "title": "CalculatedTotal",
+        "description": "Рассчитанные суммарные показатели"
+      },
+      "Futures": {
+        "properties": {
+          "futures_code": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Futures Code",
+            "description": "Краткий код фьючерса",
+            "examples": [
+              "XXXXXXXXXXXX"
+            ]
+          },
+          "asset_code": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Asset Code",
+            "description": "Торговый код базового актива"
+          },
+          "asset_type": {
+            "allOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "commodity",
+                  "currency",
+                  "futures",
+                  "index",
+                  "share"
+                ],
+                "title": "AssetType",
+                "description": "Тип базового актива"
+              }
+            ],
+            "description": "Тип базового актива"
+          },
+          "expiration_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Expiration Date",
+            "description": "Дата погашения",
+            "examples": [
+              "YYYY-MM-DD"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "futures_code",
+          "asset_code",
+          "asset_type",
+          "expiration_date"
+        ],
+        "title": "Futures",
+        "description": "Фьючерс"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "properties": {
+                "loc": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array",
+                  "title": "Location"
+                },
+                "msg": {
+                  "type": "string",
+                  "title": "Message"
+                },
+                "type": {
+                  "type": "string",
+                  "title": "Error Type"
+                }
+              },
+              "type": "object",
+              "required": [
+                "loc",
+                "msg",
+                "type"
+              ],
+              "title": "ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "IndicatorGraph": {
+        "properties": {
+          "now": {
+            "items": {
+              "properties": {
+                "underlying_price": {
+                  "type": "number",
+                  "title": "Underlying Price",
+                  "description": "Цена БА, пунктов",
+                  "examples": [
+                    123456
+                  ]
+                },
+                "value": {
+                  "type": "number",
+                  "title": "Value",
+                  "description": "Значение индикатора",
+                  "examples": [
+                    123456.12
+                  ]
+                }
+              },
+              "type": "object",
+              "required": [
+                "underlying_price",
+                "value"
+              ],
+              "title": "IndicatorGraphPoint",
+              "description": "Точка на графике индикатора"
+            },
+            "type": "array",
+            "title": "Now",
+            "description": "На текущую дату"
+          },
+          "on_expiration": {
+            "items": {
+              "properties": {
+                "underlying_price": {
+                  "type": "number",
+                  "title": "Underlying Price",
+                  "description": "Цена БА, пунктов",
+                  "examples": [
+                    123456
+                  ]
+                },
+                "value": {
+                  "type": "number",
+                  "title": "Value",
+                  "description": "Значение индикатора",
+                  "examples": [
+                    123456.12
+                  ]
+                }
+              },
+              "type": "object",
+              "required": [
+                "underlying_price",
+                "value"
+              ],
+              "title": "IndicatorGraphPoint",
+              "description": "Точка на графике индикатора"
+            },
+            "type": "array",
+            "title": "On Expiration",
+            "description": "На дату исполнения"
+          },
+          "on_what_if": {
+            "items": {
+              "properties": {
+                "underlying_price": {
+                  "type": "number",
+                  "title": "Underlying Price",
+                  "description": "Цена БА, пунктов",
+                  "examples": [
+                    123456
+                  ]
+                },
+                "value": {
+                  "type": "number",
+                  "title": "Value",
+                  "description": "Значение индикатора",
+                  "examples": [
+                    123456.12
+                  ]
+                }
+              },
+              "type": "object",
+              "required": [
+                "underlying_price",
+                "value"
+              ],
+              "title": "IndicatorGraphPoint",
+              "description": "Точка на графике индикатора"
+            },
+            "type": "array",
+            "title": "On What If",
+            "description": "С условием \"что если\""
+          }
+        },
+        "type": "object",
+        "required": [
+          "now",
+          "on_expiration"
+        ],
+        "title": "IndicatorGraph",
+        "description": "Графики индикатора"
+      },
+      "IndicatorGraphPoint": {
+        "properties": {
+          "underlying_price": {
+            "type": "number",
+            "title": "Underlying Price",
+            "description": "Цена БА, пунктов",
+            "examples": [
+              123456
+            ]
+          },
+          "value": {
+            "type": "number",
+            "title": "Value",
+            "description": "Значение индикатора",
+            "examples": [
+              123456.12
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "underlying_price",
+          "value"
+        ],
+        "title": "IndicatorGraphPoint",
+        "description": "Точка на графике индикатора"
+      },
+      "IndicatorType": {
+        "type": "string",
+        "enum": [
+          "profit_and_loss",
+          "delta",
+          "gamma",
+          "vega",
+          "theta",
+          "rho"
+        ],
+        "title": "IndicatorType",
+        "description": "Вид индикатора"
+      },
+      "InitialMarginPosition": {
+        "properties": {
+          "secid": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Secid",
+            "description": "Торговый код фьючерса или опциона",
+            "examples": [
+              "XXXXXXXXXXXX"
+            ]
+          },
+          "quantity": {
+            "type": "integer",
+            "title": "Quantity",
+            "description": "Количество покупки (отрицательное число - продажа)",
+            "examples": [
+              -123456
+            ]
+          },
+          "price": {
+            "type": "number",
+            "title": "Price",
+            "description": "Цена покупки",
+            "examples": [
+              123456.123456
+            ]
+          },
+          "netted_im": {
+            "type": "boolean",
+            "title": "Netted Im",
+            "description": "Признак неттирования гарантийного обеспечения",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "secid",
+          "quantity",
+          "price"
+        ],
+        "title": "InitialMarginPosition",
+        "description": "Позиция для расчета гарантийного обеспечения"
+      },
+      "Option": {
+        "properties": {
+          "secid": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Secid",
+            "description": "Торговый код опциона",
+            "examples": [
+              "XXXXXXXXXXXX"
+            ]
+          },
+          "asset_code": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Asset Code",
+            "description": "Торговый код базового актива"
+          },
+          "asset_type": {
+            "allOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "commodity",
+                  "currency",
+                  "futures",
+                  "index",
+                  "share"
+                ],
+                "title": "AssetType",
+                "description": "Тип базового актива"
+              }
+            ],
+            "description": "Тип базового актива"
+          },
+          "futures_code": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Futures Code",
+            "description": "Код фьючерса, если применимо",
+            "examples": [
+              "XXXXXXXXXXXX"
+            ]
+          },
+          "expiration_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Expiration Date",
+            "description": "Дата исполнения",
+            "examples": [
+              "YYYY-MM-DD"
+            ]
+          },
+          "series_type": {
+            "allOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "W",
+                  "M",
+                  "Q"
+                ],
+                "title": "OptionSeriesType",
+                "description": "Тип серии опциона"
+              }
+            ],
+            "description": "Вид серии опционов"
+          },
+          "strike": {
+            "type": "number",
+            "title": "Strike",
+            "description": "Cтрайк",
+            "examples": [
+              -123456.123
+            ]
+          },
+          "option_type": {
+            "allOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "call",
+                  "put"
+                ],
+                "title": "OptionType",
+                "description": "Тип опциона"
+              }
+            ],
+            "description": "Тип опциона (call, put)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "secid",
+          "asset_code",
+          "asset_type",
+          "expiration_date",
+          "series_type",
+          "strike",
+          "option_type"
+        ],
+        "title": "Option",
+        "description": "Опцион"
+      },
+      "OptionBoard": {
+        "properties": {
+          "call": {
+            "items": {
+              "properties": {
+                "delta": {
+                  "type": "number",
+                  "title": "Delta",
+                  "description": "Дельта, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "gamma": {
+                  "type": "number",
+                  "title": "Gamma",
+                  "description": "Гамма, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "vega": {
+                  "type": "number",
+                  "title": "Vega",
+                  "description": "Вега, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "theta": {
+                  "type": "number",
+                  "title": "Theta",
+                  "description": "Тета, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "rho": {
+                  "type": "number",
+                  "title": "Rho",
+                  "description": "Ро, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "secid": {
+                  "type": "string",
+                  "maxLength": 12,
+                  "title": "Secid",
+                  "description": "Торговый код опциона",
+                  "examples": [
+                    "XXXXXXXXXXXX"
+                  ]
+                },
+                "theorprice": {
+                  "type": "number",
+                  "title": "Theorprice",
+                  "description": "Теоретическая цена опциона, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "theorprice_rub": {
+                  "type": "number",
+                  "title": "Theorprice Rub",
+                  "description": "Теоретическая цена опциона, руб",
+                  "examples": [
+                    -1234567890.12
+                  ]
+                },
+                "last": {
+                  "type": "number",
+                  "title": "Last",
+                  "description": "Последняя цена, пунктов",
+                  "examples": [
+                    123456.123456
+                  ]
+                },
+                "offer": {
+                  "type": "number",
+                  "title": "Offer",
+                  "description": "Предложение, пунктов, руб",
+                  "examples": [
+                    123456.12
+                  ]
+                },
+                "bid": {
+                  "type": "number",
+                  "title": "Bid",
+                  "description": "Спрос, пунктов, руб",
+                  "examples": [
+                    123456.12
+                  ]
+                },
+                "numtrades": {
+                  "type": "integer",
+                  "title": "Numtrades",
+                  "description": "Количество сделок",
+                  "examples": [
+                    123456
+                  ]
+                },
+                "strike": {
+                  "type": "number",
+                  "title": "Strike",
+                  "description": "Страйк, пунктов",
+                  "examples": [
+                    123456.123
+                  ]
+                },
+                "volatility": {
+                  "type": "number",
+                  "title": "Volatility",
+                  "description": "Волатильность, процентов",
+                  "examples": [
+                    -1234567890.12
+                  ]
+                },
+                "intrinsic_value": {
+                  "type": "number",
+                  "title": "Intrinsic Value",
+                  "description": "Внутренняя стоимость, пунктов",
+                  "examples": [
+                    -1234567890.12
+                  ]
+                },
+                "timed_value": {
+                  "type": "number",
+                  "title": "Timed Value",
+                  "description": "ВременнАя стоимость, пунктов",
+                  "examples": [
+                    -1234567890.12
+                  ]
+                }
+              },
+              "type": "object",
+              "required": [
+                "secid",
+                "strike"
+              ],
+              "title": "OptionBoardRow",
+              "description": "Опцион с индикаторами"
+            },
+            "type": "array",
+            "title": "Call",
+            "description": "Опционы на покупку"
+          },
+          "put": {
+            "items": {
+              "properties": {
+                "delta": {
+                  "type": "number",
+                  "title": "Delta",
+                  "description": "Дельта, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "gamma": {
+                  "type": "number",
+                  "title": "Gamma",
+                  "description": "Гамма, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "vega": {
+                  "type": "number",
+                  "title": "Vega",
+                  "description": "Вега, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "theta": {
+                  "type": "number",
+                  "title": "Theta",
+                  "description": "Тета, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "rho": {
+                  "type": "number",
+                  "title": "Rho",
+                  "description": "Ро, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "secid": {
+                  "type": "string",
+                  "maxLength": 12,
+                  "title": "Secid",
+                  "description": "Торговый код опциона",
+                  "examples": [
+                    "XXXXXXXXXXXX"
+                  ]
+                },
+                "theorprice": {
+                  "type": "number",
+                  "title": "Theorprice",
+                  "description": "Теоретическая цена опциона, пунктов",
+                  "examples": [
+                    -1234567890.123456
+                  ]
+                },
+                "theorprice_rub": {
+                  "type": "number",
+                  "title": "Theorprice Rub",
+                  "description": "Теоретическая цена опциона, руб",
+                  "examples": [
+                    -1234567890.12
+                  ]
+                },
+                "last": {
+                  "type": "number",
+                  "title": "Last",
+                  "description": "Последняя цена, пунктов",
+                  "examples": [
+                    123456.123456
+                  ]
+                },
+                "offer": {
+                  "type": "number",
+                  "title": "Offer",
+                  "description": "Предложение, пунктов, руб",
+                  "examples": [
+                    123456.12
+                  ]
+                },
+                "bid": {
+                  "type": "number",
+                  "title": "Bid",
+                  "description": "Спрос, пунктов, руб",
+                  "examples": [
+                    123456.12
+                  ]
+                },
+                "numtrades": {
+                  "type": "integer",
+                  "title": "Numtrades",
+                  "description": "Количество сделок",
+                  "examples": [
+                    123456
+                  ]
+                },
+                "strike": {
+                  "type": "number",
+                  "title": "Strike",
+                  "description": "Страйк, пунктов",
+                  "examples": [
+                    123456.123
+                  ]
+                },
+                "volatility": {
+                  "type": "number",
+                  "title": "Volatility",
+                  "description": "Волатильность, процентов",
+                  "examples": [
+                    -1234567890.12
+                  ]
+                },
+                "intrinsic_value": {
+                  "type": "number",
+                  "title": "Intrinsic Value",
+                  "description": "Внутренняя стоимость, пунктов",
+                  "examples": [
+                    -1234567890.12
+                  ]
+                },
+                "timed_value": {
+                  "type": "number",
+                  "title": "Timed Value",
+                  "description": "ВременнАя стоимость, пунктов",
+                  "examples": [
+                    -1234567890.12
+                  ]
+                }
+              },
+              "type": "object",
+              "required": [
+                "secid",
+                "strike"
+              ],
+              "title": "OptionBoardRow",
+              "description": "Опцион с индикаторами"
+            },
+            "type": "array",
+            "title": "Put",
+            "description": "Опционы на продажу"
+          }
+        },
+        "type": "object",
+        "required": [
+          "call",
+          "put"
+        ],
+        "title": "OptionBoard",
+        "description": "Доска опционов"
+      },
+      "OptionBoardRow": {
+        "properties": {
+          "delta": {
+            "type": "number",
+            "title": "Delta",
+            "description": "Дельта, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "gamma": {
+            "type": "number",
+            "title": "Gamma",
+            "description": "Гамма, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "vega": {
+            "type": "number",
+            "title": "Vega",
+            "description": "Вега, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "theta": {
+            "type": "number",
+            "title": "Theta",
+            "description": "Тета, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "rho": {
+            "type": "number",
+            "title": "Rho",
+            "description": "Ро, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "secid": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Secid",
+            "description": "Торговый код опциона",
+            "examples": [
+              "XXXXXXXXXXXX"
+            ]
+          },
+          "theorprice": {
+            "type": "number",
+            "title": "Theorprice",
+            "description": "Теоретическая цена опциона, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "theorprice_rub": {
+            "type": "number",
+            "title": "Theorprice Rub",
+            "description": "Теоретическая цена опциона, руб",
+            "examples": [
+              -1234567890.12
+            ]
+          },
+          "last": {
+            "type": "number",
+            "title": "Last",
+            "description": "Последняя цена, пунктов",
+            "examples": [
+              123456.123456
+            ]
+          },
+          "offer": {
+            "type": "number",
+            "title": "Offer",
+            "description": "Предложение, пунктов, руб",
+            "examples": [
+              123456.12
+            ]
+          },
+          "bid": {
+            "type": "number",
+            "title": "Bid",
+            "description": "Спрос, пунктов, руб",
+            "examples": [
+              123456.12
+            ]
+          },
+          "numtrades": {
+            "type": "integer",
+            "title": "Numtrades",
+            "description": "Количество сделок",
+            "examples": [
+              123456
+            ]
+          },
+          "strike": {
+            "type": "number",
+            "title": "Strike",
+            "description": "Страйк, пунктов",
+            "examples": [
+              123456.123
+            ]
+          },
+          "volatility": {
+            "type": "number",
+            "title": "Volatility",
+            "description": "Волатильность, процентов",
+            "examples": [
+              -1234567890.12
+            ]
+          },
+          "intrinsic_value": {
+            "type": "number",
+            "title": "Intrinsic Value",
+            "description": "Внутренняя стоимость, пунктов",
+            "examples": [
+              -1234567890.12
+            ]
+          },
+          "timed_value": {
+            "type": "number",
+            "title": "Timed Value",
+            "description": "ВременнАя стоимость, пунктов",
+            "examples": [
+              -1234567890.12
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "secid",
+          "strike"
+        ],
+        "title": "OptionBoardRow",
+        "description": "Опцион с индикаторами"
+      },
+      "OptionBrief": {
+        "properties": {
+          "delta": {
+            "type": "number",
+            "title": "Delta",
+            "description": "Дельта, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "gamma": {
+            "type": "number",
+            "title": "Gamma",
+            "description": "Гамма, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "vega": {
+            "type": "number",
+            "title": "Vega",
+            "description": "Вега, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "theta": {
+            "type": "number",
+            "title": "Theta",
+            "description": "Тета, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "rho": {
+            "type": "number",
+            "title": "Rho",
+            "description": "Ро, пунктов",
+            "examples": [
+              -1234567890.123456
+            ]
+          },
+          "secid": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Secid",
+            "description": "Торговый код опциона",
+            "examples": [
+              "XXXXXXXXXXXX"
+            ]
+          },
+          "days_until_expiring": {
+            "type": "integer",
+            "title": "Days Until Expiring",
+            "description": "Дней до исполнения",
+            "examples": [
+              123456
+            ]
+          },
+          "underlying_price": {
+            "type": "number",
+            "title": "Underlying Price",
+            "description": "Цена БА, пунктов",
+            "examples": [
+              123456.12
+            ]
+          },
+          "volatility": {
+            "type": "number",
+            "title": "Volatility",
+            "description": "Волатильность, процентов",
+            "examples": [
+              123456.12
+            ]
+          },
+          "underlying_asset": {
+            "type": "string",
+            "maxLength": 36,
+            "title": "Underlying Asset",
+            "description": "Базовый актив"
+          },
+          "underlying_type": {
+            "allOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "commodity",
+                  "currency",
+                  "futures",
+                  "index",
+                  "share"
+                ],
+                "title": "AssetType",
+                "description": "Тип базового актива"
+              }
+            ],
+            "description": "Тип базового актива"
+          },
+          "theorprice": {
+            "type": "number",
+            "title": "Theorprice",
+            "description": "Теор цена, пунктов",
+            "examples": [
+              123456.123456
+            ]
+          },
+          "fee": {
+            "type": "number",
+            "title": "Fee",
+            "description": "Комиссия, руб",
+            "examples": [
+              -1234567890.12
+            ]
+          },
+          "expiring_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Expiring Date",
+            "description": "Дата исполнения опциона, формат YYYY-MM-DD",
+            "examples": [
+              "YYYY-MM-DD"
+            ]
+          },
+          "lastprice": {
+            "type": "number",
+            "title": "Lastprice",
+            "description": "Последняя цена базового актива, руб",
+            "examples": [
+              123456.12
+            ]
+          },
+          "settleprice": {
+            "type": "number",
+            "title": "Settleprice",
+            "description": "Расчетная цена БА, руб",
+            "examples": [
+              123456.12
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "secid",
+          "days_until_expiring",
+          "underlying_price",
+          "volatility",
+          "underlying_asset",
+          "underlying_type",
+          "theorprice",
+          "expiring_date",
+          "lastprice",
+          "settleprice"
+        ],
+        "title": "OptionBrief",
+        "description": "Расчетные параметры для выбранного опциона"
+      },
+      "OptionPortfolio": {
+        "properties": {
+          "asset_code": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Asset Code",
+            "description": "Торговый код базового актива"
+          },
+          "asset_type": {
+            "allOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "commodity",
+                  "currency",
+                  "futures",
+                  "index",
+                  "share"
+                ],
+                "title": "AssetType",
+                "description": "Тип базового актива"
+              }
+            ],
+            "description": "Тип базового актива"
+          },
+          "positions": {
+            "items": {
+              "properties": {
+                "secid": {
+                  "type": "string",
+                  "maxLength": 12,
+                  "title": "Secid",
+                  "description": "Торговый код",
+                  "examples": [
+                    "XXXXXXXXXXXX"
+                  ]
+                },
+                "type": {
+                  "allOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "currency",
+                        "commodity",
+                        "futures",
+                        "option",
+                        "share"
+                      ],
+                      "title": "SimulatedPositionType",
+                      "description": "Вид тикера в моделируемой позиции"
+                    }
+                  ],
+                  "description": "Вид торгового инструмента"
+                },
+                "quantity": {
+                  "type": "integer",
+                  "title": "Quantity",
+                  "description": "Количество покупки (отрицательное число - продажа)",
+                  "examples": [
+                    -123456
+                  ]
+                },
+                "price": {
+                  "type": "number",
+                  "title": "Price",
+                  "description": "Цена покупки",
+                  "examples": [
+                    123456.123456
+                  ]
+                },
+                "volatility": {
+                  "type": "number",
+                  "title": "Volatility",
+                  "description": "Волатильность, процентов",
+                  "examples": [
+                    1234.12
+                  ],
+                  "gte": 0
+                },
+                "netted_im": {
+                  "type": "boolean",
+                  "title": "Netted Im",
+                  "description": "Признак неттирования гарантийного обеспечения",
+                  "default": true
+                }
+              },
+              "type": "object",
+              "required": [
+                "secid",
+                "quantity"
+              ],
+              "title": "SimulatedPosition",
+              "description": "Моделируемая позиция"
+            },
+            "type": "array",
+            "title": "Positions",
+            "description": "Моделируемые позиции"
+          },
+          "what_if": {
+            "allOf": [
+              {
+                "properties": {
+                  "delta_sigma": {
+                    "type": "number",
+                    "title": "Delta Sigma",
+                    "description": "Смещение волатильности, процентов",
+                    "examples": [
+                      -12.12
+                    ],
+                    "gte": -100
+                  },
+                  "date_of_calculation": {
+                    "type": "string",
+                    "format": "date",
+                    "title": "Date Of Calculation",
+                    "description": "Дата рассчета",
+                    "examples": [
+                      "YYYY-MM-DD"
+                    ]
+                  }
+                },
+                "type": "object",
+                "title": "WhatIfCondition",
+                "description": "Условие 'что если'"
+              }
+            ],
+            "title": "What If",
+            "description": "Условие \"что если\""
+          }
+        },
+        "type": "object",
+        "required": [
+          "asset_code",
+          "positions"
+        ],
+        "title": "OptionPortfolio",
+        "description": "Опционный портфель"
+      },
+      "OptionSeries": {
+        "properties": {
+          "optionseries_code": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Optionseries Code",
+            "description": "Код серии опциона",
+            "examples": [
+              "XXXXXXXXXXXX"
+            ]
+          },
+          "asset_code": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Asset Code",
+            "description": "Торговый код базового актива",
+            "examples": [
+              "XXXXXXXXXXXX"
+            ]
+          },
+          "asset_type": {
+            "allOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "commodity",
+                  "currency",
+                  "futures",
+                  "index",
+                  "share"
+                ],
+                "title": "AssetType",
+                "description": "Тип базового актива"
+              }
+            ],
+            "description": "Тип базового актива"
+          },
+          "futures_code": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Futures Code",
+            "description": "Код фьючерса, если применимо",
+            "examples": [
+              "XXXXXXXXXXXX"
+            ]
+          },
+          "series_type": {
+            "allOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "W",
+                  "M",
+                  "Q"
+                ],
+                "title": "OptionSeriesType",
+                "description": "Тип серии опциона"
+              }
+            ],
+            "description": "Вид серии опционов"
+          },
+          "expiration_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Expiration Date",
+            "description": "Дата погашения",
+            "examples": [
+              "YYYY-MM-DD"
+            ]
+          },
+          "central_strike": {
+            "type": "number",
+            "title": "Central Strike",
+            "description": "Центральный страйк",
+            "examples": [
+              123456.123456
+            ]
+          },
+          "call": {
+            "allOf": [
+              {
+                "properties": {
+                  "volume_rub": {
+                    "type": "number",
+                    "title": "Volume Rub",
+                    "description": "Объем в рублях",
+                    "default": 0,
+                    "examples": [
+                      123456.12
+                    ]
+                  },
+                  "volume_contracts": {
+                    "type": "integer",
+                    "title": "Volume Contracts",
+                    "description": "Объем контрактов",
+                    "default": 0,
+                    "examples": [
+                      123456
+                    ]
+                  },
+                  "openposition": {
+                    "type": "integer",
+                    "title": "Openposition",
+                    "description": "Число открытых позиций",
+                    "default": 0,
+                    "examples": [
+                      123456
+                    ]
+                  },
+                  "oichange": {
+                    "type": "integer",
+                    "title": "Oichange",
+                    "description": "Изменение числа открытых позиций",
+                    "default": 0,
+                    "examples": [
+                      123456
+                    ]
+                  }
+                },
+                "type": "object",
+                "title": "OptionSeriesTotals",
+                "description": "Суммарные показатели"
+              }
+            ],
+            "title": "Call",
+            "description": "Суммарно для call-опционов"
+          },
+          "put": {
+            "allOf": [
+              {
+                "properties": {
+                  "volume_rub": {
+                    "type": "number",
+                    "title": "Volume Rub",
+                    "description": "Объем в рублях",
+                    "default": 0,
+                    "examples": [
+                      123456.12
+                    ]
+                  },
+                  "volume_contracts": {
+                    "type": "integer",
+                    "title": "Volume Contracts",
+                    "description": "Объем контрактов",
+                    "default": 0,
+                    "examples": [
+                      123456
+                    ]
+                  },
+                  "openposition": {
+                    "type": "integer",
+                    "title": "Openposition",
+                    "description": "Число открытых позиций",
+                    "default": 0,
+                    "examples": [
+                      123456
+                    ]
+                  },
+                  "oichange": {
+                    "type": "integer",
+                    "title": "Oichange",
+                    "description": "Изменение числа открытых позиций",
+                    "default": 0,
+                    "examples": [
+                      123456
+                    ]
+                  }
+                },
+                "type": "object",
+                "title": "OptionSeriesTotals",
+                "description": "Суммарные показатели"
+              }
+            ],
+            "title": "Put",
+            "description": "Суммарно для put-опционов"
+          },
+          "updatetime": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatetime",
+            "description": "Время обновления информации"
+          }
+        },
+        "type": "object",
+        "required": [
+          "optionseries_code",
+          "asset_code",
+          "asset_type",
+          "series_type",
+          "expiration_date",
+          "central_strike"
+        ],
+        "title": "OptionSeries",
+        "description": "Серия опциона с сумарными показателями по входящим в серию опционам"
+      },
+      "OptionSeriesTotals": {
+        "properties": {
+          "volume_rub": {
+            "type": "number",
+            "title": "Volume Rub",
+            "description": "Объем в рублях",
+            "default": 0,
+            "examples": [
+              123456.12
+            ]
+          },
+          "volume_contracts": {
+            "type": "integer",
+            "title": "Volume Contracts",
+            "description": "Объем контрактов",
+            "default": 0,
+            "examples": [
+              123456
+            ]
+          },
+          "openposition": {
+            "type": "integer",
+            "title": "Openposition",
+            "description": "Число открытых позиций",
+            "default": 0,
+            "examples": [
+              123456
+            ]
+          },
+          "oichange": {
+            "type": "integer",
+            "title": "Oichange",
+            "description": "Изменение числа открытых позиций",
+            "default": 0,
+            "examples": [
+              123456
+            ]
+          }
+        },
+        "type": "object",
+        "title": "OptionSeriesTotals",
+        "description": "Суммарные показатели"
+      },
+      "OptionSeriesType": {
+        "type": "string",
+        "enum": [
+          "W",
+          "M",
+          "Q"
+        ],
+        "title": "OptionSeriesType",
+        "description": "Тип серии опциона"
+      },
+      "OptionType": {
+        "type": "string",
+        "enum": [
+          "call",
+          "put"
+        ],
+        "title": "OptionType",
+        "description": "Тип опциона"
+      },
+      "SimulatedPosition": {
+        "properties": {
+          "secid": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Secid",
+            "description": "Торговый код",
+            "examples": [
+              "XXXXXXXXXXXX"
+            ]
+          },
+          "type": {
+            "allOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "currency",
+                  "commodity",
+                  "futures",
+                  "option",
+                  "share"
+                ],
+                "title": "SimulatedPositionType",
+                "description": "Вид тикера в моделируемой позиции"
+              }
+            ],
+            "description": "Вид торгового инструмента"
+          },
+          "quantity": {
+            "type": "integer",
+            "title": "Quantity",
+            "description": "Количество покупки (отрицательное число - продажа)",
+            "examples": [
+              -123456
+            ]
+          },
+          "price": {
+            "type": "number",
+            "title": "Price",
+            "description": "Цена покупки",
+            "examples": [
+              123456.123456
+            ]
+          },
+          "volatility": {
+            "type": "number",
+            "title": "Volatility",
+            "description": "Волатильность, процентов",
+            "examples": [
+              1234.12
+            ],
+            "gte": 0
+          },
+          "netted_im": {
+            "type": "boolean",
+            "title": "Netted Im",
+            "description": "Признак неттирования гарантийного обеспечения",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "secid",
+          "quantity"
+        ],
+        "title": "SimulatedPosition",
+        "description": "Моделируемая позиция"
+      },
+      "SimulatedPositionType": {
+        "type": "string",
+        "enum": [
+          "currency",
+          "commodity",
+          "futures",
+          "option",
+          "share"
+        ],
+        "title": "SimulatedPositionType",
+        "description": "Вид тикера в моделируемой позиции"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VolatilityGraphPoint": {
+        "properties": {
+          "strike": {
+            "type": "number",
+            "title": "Strike",
+            "description": "Страйк, пунктов",
+            "examples": [
+              123456.123
+            ]
+          },
+          "volatility": {
+            "type": "number",
+            "title": "Volatility",
+            "description": "Волатильность, процентов",
+            "examples": [
+              123456.12
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "strike",
+          "volatility"
+        ],
+        "title": "VolatilityGraphPoint",
+        "description": "Точка на графике волатильности"
+      },
+      "WhatIfCondition": {
+        "properties": {
+          "delta_sigma": {
+            "type": "number",
+            "title": "Delta Sigma",
+            "description": "Смещение волатильности, процентов",
+            "examples": [
+              -12.12
+            ],
+            "gte": -100
+          },
+          "date_of_calculation": {
+            "type": "string",
+            "format": "date",
+            "title": "Date Of Calculation",
+            "description": "Дата рассчета",
+            "examples": [
+              "YYYY-MM-DD"
+            ]
+          }
+        },
+        "type": "object",
+        "title": "WhatIfCondition",
+        "description": "Условие 'что если'"
+      }
+    }
+  }
+}

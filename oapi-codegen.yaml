@@ -1,0 +1,18 @@
+# oapi-codegen v2 config — plain-struct models only, into the public
+# moexoptcalc package. Run via the Taskfile `gen` target.
+package: moexoptcalc
+output: models.gen.go
+generate:
+  models: true
+output-options:
+  skip-prune: true
+  # FastAPI's error envelope (HTTPValidationError/ValidationError) is the spec's
+  # only union member (ValidationError.loc is string|int), which makes
+  # oapi-codegen emit composed-type helpers backed by
+  # github.com/oapi-codegen/runtime (runtime.JSONMerge, As*/From*). The client
+  # never decodes into these — it surfaces a non-2xx body verbatim as
+  # APIError.Body (string) — so excluding them drops the dead union code and the
+  # sole oapi-codegen/runtime dependency.
+  exclude-schemas:
+    - HTTPValidationError
+    - ValidationError

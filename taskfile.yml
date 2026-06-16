@@ -1,0 +1,99 @@
+version: "3"
+
+vars:
+  # Upstream MOEX option-calc OpenAPI spec.
+  SPEC_URL: https://iss.moex.com/iss/apps/option-calc/v1/openapi.json
+  # Pinned codegen toolchain — all run via Docker, no local install needed.
+  SPEAKEASY_IMAGE: ghcr.io/speakeasy-api/speakeasy:latest
+  REDOCLY_IMAGE: ghcr.io/redocly/cli:latest
+
+tasks:
+  spec:
+    desc: Download the upstream MOEX option-calc OpenAPI spec (committed verbatim)
+    cmds:
+      - curl -fsSL {{.SPEC_URL}} -o spec/spec-upstream.json
+
+  overlay:
+    desc: Apply spec/overlay.yml to spec-upstream.json -> spec/spec.json (oapi-codegen's input)
+    cmds:
+      - >
+        docker run --rm -v "$PWD/spec:/work" {{.SPEAKEASY_IMAGE}}
+        overlay apply -s /work/spec-upstream.json -o /work/overlay.yml
+        --out /work/spec.json --strict
+
+  deref:
+    desc: Dereference the upstream spec -> spec/spec-deref.json (MCP transformer's input)
+    cmds:
+      # --dereferenced inlines every $ref while retaining components.schemas (no
+      # --remove-unused-components), so a name->schema lookup still works
+      # downstream. Built straight from spec-upstream.json so the MCP document
+      # stays a faithful OpenAPI 3.1 spec — the overlay carries only
+      # oapi-codegen-specific transforms (x-go-type, format:double, the 3.0.3
+      # relabel) that have no business in the MCP schema.
+      - >
+        docker run --rm -v "$PWD/spec:/work" {{.REDOCLY_IMAGE}}
+        bundle /work/spec-upstream.json -o /work/spec-deref.json --dereferenced
+
+  gen:
+    desc: Generate plain-struct models into models.gen.go (fails on any oapi-codegen warning)
+    deps: [overlay]
+    cmds:
+      - |
+        out=$(go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.5.0 \
+          -config oapi-codegen.yaml spec/spec.json 2>&1)
+        echo "$out"
+        if echo "$out" | grep -iqE 'warn'; then
+          echo "FAIL: oapi-codegen emitted warnings" >&2
+          exit 1
+        fi
+        exit 0  # else-less `if` leaks grep's non-zero status; pin success.
+      - gofmt -w models.gen.go
+
+  tidy:
+    desc: Tidy go.mod
+    cmds:
+      - go mod tidy
+
+  lint:
+    desc: Run formatters + linters with autofix (mutates files)
+    cmds:
+      - golangci-lint fmt
+      - golangci-lint run --fix
+
+  ci:
+    desc: Read-only fmt + lint verification for CI (fail-fast)
+    cmds:
+      - golangci-lint fmt --diff
+      - golangci-lint run
+
+  test:
+    desc: Run tests (includes live API calls; use -short to skip)
+    cmds:
+      - go test ./...
+
+  vet:
+    desc: Run go vet
+    cmds:
+      - go vet ./...
+
+  check:
+    desc: Local composite — lint (mutating) + vet + tests
+    cmds:
+      - task: lint
+      - task: vet
+      - task: test
+
+  build:
+    desc: Local snapshot release (validates GoReleaser config; no publish)
+    cmds:
+      - goreleaser release --snapshot --clean --skip=publish
+
+  release:
+    desc: Tagged release via GoReleaser — GitHub Release + changelog (CI)
+    cmds:
+      - goreleaser release --clean
+
+  update:
+    desc: Pull latest go-scaffolds v1 template tooling (3-way merge; source untouched)
+    cmds:
+      - uvx copier update --vcs-ref v1
