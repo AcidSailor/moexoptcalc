@@ -82,9 +82,6 @@ generated models and the hand-written transport share that one package.
 
 ## Conventions & gotchas
 
-- **`go.mod` has a `replace github.com/acidsailor/restkit => ../restkit`** for
-  local development. It must be removed (and restkit published) before release.
-  All OTel modules are `// indirect`, pulled in via restkit.
 - **`task gen` fails on any oapi-codegen warning** (greps output for `warn`).
   The overlay relabels the spec to `3.0.3` for the codegen branch to avoid the
   3.1 "not yet supported" warning; the deref/MCP branch stays 3.1.
