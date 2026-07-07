@@ -47,12 +47,12 @@ import (
 )
 
 func main() {
-	c, err := moexoptcalc.New(moexoptcalc.EndpointProduction)
+	c, err := moexoptcalc.NewClient(moexoptcalc.EndpointProduction)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	opt, err := c.GetOption(context.Background(), moexoptcalc.GetOptionParams{
+	opt, err := c.GetOption(context.Background(), moexoptcalc.GetOptionRequest{
 		AssetCode: "Si",
 		Secid:     "SI84500BE6B",
 	})
@@ -87,7 +87,7 @@ All live on `*moexoptcalc.Client`:
 
 ## Configuration
 
-`moexoptcalc.New(endpoint, ...ClientOption)` takes the target endpoint —
+`moexoptcalc.NewClient(endpoint, ...ClientOption)` takes the target endpoint —
 use `moexoptcalc.EndpointProduction` for the public MOEX ISS host. The
 Options Calculator API has no separate test environment and needs no
 credentials, so there are **no environment variables** to set.
@@ -97,7 +97,7 @@ default transport. Override it with `WithHTTPClient` (for a custom timeout,
 transport, or proxy):
 
 ```go
-c, err := moexoptcalc.New(moexoptcalc.EndpointProduction,
+c, err := moexoptcalc.NewClient(moexoptcalc.EndpointProduction,
 	moexoptcalc.WithHTTPClient(&http.Client{Timeout: 60 * time.Second}))
 ```
 

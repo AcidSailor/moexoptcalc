@@ -18,7 +18,7 @@ import (
 // t.Deadline via the request context.
 func newTestClient(t *testing.T) *moexoptcalc.Client {
 	t.Helper()
-	c, err := moexoptcalc.New(moexoptcalc.EndpointProduction)
+	c, err := moexoptcalc.NewClient(moexoptcalc.EndpointProduction)
 	if err != nil {
 		t.Fatalf("New: %v", err)
 	}
@@ -38,7 +38,7 @@ func TestNew_InvalidConfig(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			_, err := moexoptcalc.New(tc.endpoint)
+			_, err := moexoptcalc.NewClient(tc.endpoint)
 			if err == nil {
 				t.Fatalf("expected error, got nil")
 			}
@@ -69,7 +69,7 @@ func TestWithHTTPClient_StubIsCalled(t *testing.T) {
 		return http.DefaultTransport.RoundTrip(req)
 	})
 
-	c, err := moexoptcalc.New(
+	c, err := moexoptcalc.NewClient(
 		srv.URL,
 		moexoptcalc.WithHTTPClient(
 			&http.Client{Transport: stub, Timeout: 30 * time.Second},
@@ -79,7 +79,7 @@ func TestWithHTTPClient_StubIsCalled(t *testing.T) {
 		t.Fatalf("New: %v", err)
 	}
 
-	_, err = c.ListAssets(context.Background(), moexoptcalc.ListAssetsParams{})
+	_, err = c.ListAssets(context.Background(), moexoptcalc.ListAssetsRequest{})
 	if err != nil {
 		t.Fatalf("ListAssets: %v", err)
 	}
@@ -92,7 +92,7 @@ func TestWithHTTPClient_StubIsCalled(t *testing.T) {
 // is benign: New ignores it and uses restkit's default.
 func TestWithHTTPClient_NilFallsBackToDefault(t *testing.T) {
 	t.Parallel()
-	c, err := moexoptcalc.New(moexoptcalc.EndpointProduction,
+	c, err := moexoptcalc.NewClient(moexoptcalc.EndpointProduction,
 		moexoptcalc.WithHTTPClient(nil))
 	if err != nil {
 		t.Fatalf(
@@ -123,7 +123,7 @@ func TestListAssets_Live(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	assets, err := c.ListAssets(ctx, moexoptcalc.ListAssetsParams{})
+	assets, err := c.ListAssets(ctx, moexoptcalc.ListAssetsRequest{})
 	if err != nil {
 		t.Fatalf("ListAssets: %v", err)
 	}
@@ -169,7 +169,7 @@ func TestGetOption_Live(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	series, err := c.ListOptionSeries(ctx, moexoptcalc.ListOptionSeriesParams{
+	series, err := c.ListOptionSeries(ctx, moexoptcalc.ListOptionSeriesRequest{
 		AssetCode: "Si",
 	})
 	if err != nil {
@@ -179,7 +179,7 @@ func TestGetOption_Live(t *testing.T) {
 		t.Fatal("ListOptionSeries(Si) returned empty list")
 	}
 	seriesCode := series[0].OptionseriesCode
-	opts, err := c.ListSeriesOptions(ctx, moexoptcalc.ListSeriesOptionsParams{
+	opts, err := c.ListSeriesOptions(ctx, moexoptcalc.ListSeriesOptionsRequest{
 		AssetCode:        "Si",
 		OptionseriesCode: seriesCode,
 	})
@@ -191,7 +191,7 @@ func TestGetOption_Live(t *testing.T) {
 	}
 	secid := opts[0].Secid
 
-	brief, err := c.GetOption(ctx, moexoptcalc.GetOptionParams{
+	brief, err := c.GetOption(ctx, moexoptcalc.GetOptionRequest{
 		AssetCode: "Si",
 		Secid:     secid,
 	})
@@ -223,7 +223,7 @@ func TestGetOption_NotFound(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	_, err := c.GetOption(ctx, moexoptcalc.GetOptionParams{
+	_, err := c.GetOption(ctx, moexoptcalc.GetOptionRequest{
 		AssetCode: "Si",
 		Secid:     "NOTAREALSEC",
 	})
@@ -253,7 +253,7 @@ func TestGetAsset_AmbiguousCode(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	_, err := c.GetAsset(ctx, moexoptcalc.GetAssetParams{AssetCode: "LKOH"})
+	_, err := c.GetAsset(ctx, moexoptcalc.GetAssetRequest{AssetCode: "LKOH"})
 	if err == nil {
 		t.Fatal("expected 422 for ambiguous code LKOH, got nil")
 	}
