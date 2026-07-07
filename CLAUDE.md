@@ -53,13 +53,13 @@ generated models and the hand-written transport share that one package.
   (nil = absent); required fields are values. Read methods return the struct
   directly.
 - **Transport** wraps the models. `client.go` defines `Client`, holding a
-  `*restkit.Client` (`github.com/acidsailor/restkit`). `New(endpoint,
+  `*restkit.Client` (`github.com/acidsailor/restkit`). `NewClient(endpoint,
   ...ClientOption)` is the entry point; returns `*ConfigError` on an empty
   endpoint. The 13 per-operation methods are thin wrappers over generic
   `restkit.Do[T]`. The option type is `ClientOption` (not `Option`, the
   generated model for an option instrument); the only option is
   `WithHTTPClient`.
-- **`params.go`** holds the per-method `*Params` structs. Path params are
+- **`params.go`** holds the per-method `*Request` structs. Path params are
   required strings; optional query filters are pointers; date filters are
   `*Date`. The `Date` (date-only, `2006-01-02`) and `DateTime` (parsed through
   `Europe/Moscow`, wire form `2006-01-02T15:04:05`) types are package-local

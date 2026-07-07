@@ -30,13 +30,13 @@ func TestListOptions_RequestBuilding(t *testing.T) {
 	)
 	defer srv.Close()
 
-	c, err := moexoptcalc.New(srv.URL)
+	c, err := moexoptcalc.NewClient(srv.URL)
 	require.NoError(t, err, "New")
 	at := "futures"
 	ot := "call"
 	got, err := c.ListOptions(
 		context.Background(),
-		moexoptcalc.ListOptionsParams{
+		moexoptcalc.ListOptionsRequest{
 			AssetCode:  "Si",
 			AssetType:  &at,
 			OptionType: &ot,
@@ -66,7 +66,7 @@ func TestCalculateInitialMargin_PostBody(t *testing.T) {
 	)
 	defer srv.Close()
 
-	c, err := moexoptcalc.New(srv.URL)
+	c, err := moexoptcalc.NewClient(srv.URL)
 	require.NoError(t, err, "New")
 	got, err := c.CalculateInitialMargin(
 		context.Background(),
@@ -110,10 +110,10 @@ func TestListFutures_DateQuery(t *testing.T) {
 	t.Parallel()
 	srv, gotPath, gotQuery := captureServer(t)
 
-	c, err := moexoptcalc.New(srv.URL)
+	c, err := moexoptcalc.NewClient(srv.URL)
 	require.NoError(t, err, "New")
 	exp := moexoptcalc.NewDate(time.Date(2026, 5, 12, 0, 0, 0, 0, time.UTC))
-	_, err = c.ListFutures(context.Background(), moexoptcalc.ListFuturesParams{
+	_, err = c.ListFutures(context.Background(), moexoptcalc.ListFuturesRequest{
 		AssetCode:      "Si",
 		ExpirationDate: &exp,
 	})
@@ -128,9 +128,9 @@ func TestListFutures_NilDateOmitted(t *testing.T) {
 	t.Parallel()
 	srv, _, gotQuery := captureServer(t)
 
-	c, err := moexoptcalc.New(srv.URL)
+	c, err := moexoptcalc.NewClient(srv.URL)
 	require.NoError(t, err, "New")
-	_, err = c.ListFutures(context.Background(), moexoptcalc.ListFuturesParams{
+	_, err = c.ListFutures(context.Background(), moexoptcalc.ListFuturesRequest{
 		AssetCode: "Si",
 	})
 	require.NoError(t, err, "ListFutures")
@@ -146,12 +146,12 @@ func TestStrike_WireTypes(t *testing.T) {
 	t.Run("ListOptions sends float", func(t *testing.T) {
 		t.Parallel()
 		srv, _, gotQuery := captureServer(t)
-		c, err := moexoptcalc.New(srv.URL)
+		c, err := moexoptcalc.NewClient(srv.URL)
 		require.NoError(t, err, "New")
 		strike := 95000.5
 		_, err = c.ListOptions(
 			context.Background(),
-			moexoptcalc.ListOptionsParams{
+			moexoptcalc.ListOptionsRequest{
 				AssetCode: "Si",
 				Strike:    &strike,
 			},
@@ -163,12 +163,12 @@ func TestStrike_WireTypes(t *testing.T) {
 	t.Run("ListSeriesOptions sends integer", func(t *testing.T) {
 		t.Parallel()
 		srv, _, gotQuery := captureServer(t)
-		c, err := moexoptcalc.New(srv.URL)
+		c, err := moexoptcalc.NewClient(srv.URL)
 		require.NoError(t, err, "New")
 		strike := int32(95000)
 		_, err = c.ListSeriesOptions(
 			context.Background(),
-			moexoptcalc.ListSeriesOptionsParams{
+			moexoptcalc.ListSeriesOptionsRequest{
 				AssetCode:        "Si",
 				OptionseriesCode: "Si-6.26",
 				Strike:           &strike,
@@ -185,9 +185,9 @@ func TestPathEscaping(t *testing.T) {
 	t.Parallel()
 	srv, gotPath, gotQuery := captureServer(t)
 
-	c, err := moexoptcalc.New(srv.URL)
+	c, err := moexoptcalc.NewClient(srv.URL)
 	require.NoError(t, err, "New")
-	_, err = c.ListOptions(context.Background(), moexoptcalc.ListOptionsParams{
+	_, err = c.ListOptions(context.Background(), moexoptcalc.ListOptionsRequest{
 		AssetCode: "Si?x",
 	})
 	require.NoError(t, err, "ListOptions")
@@ -213,11 +213,11 @@ func TestErrorMapping(t *testing.T) {
 	)
 	defer srv.Close()
 
-	c, err := moexoptcalc.New(srv.URL)
+	c, err := moexoptcalc.NewClient(srv.URL)
 	require.NoError(t, err, "New")
 	_, err = c.GetAsset(
 		context.Background(),
-		moexoptcalc.GetAssetParams{AssetCode: "LKOH"},
+		moexoptcalc.GetAssetRequest{AssetCode: "LKOH"},
 	)
 	require.Error(t, err, "expected error")
 	var respErr *moexoptcalc.ResponseError
@@ -245,9 +245,9 @@ func TestDecodeError(t *testing.T) {
 	)
 	defer srv.Close()
 
-	c, err := moexoptcalc.New(srv.URL)
+	c, err := moexoptcalc.NewClient(srv.URL)
 	require.NoError(t, err, "New")
-	_, err = c.ListAssets(context.Background(), moexoptcalc.ListAssetsParams{})
+	_, err = c.ListAssets(context.Background(), moexoptcalc.ListAssetsRequest{})
 	require.Error(t, err, "expected decode error")
 	var reqErr *moexoptcalc.RequestError
 	require.ErrorAs(t, err, &reqErr, "decode failure should be a *RequestError")
@@ -275,7 +275,7 @@ func TestEncodeError(t *testing.T) {
 	)
 	defer srv.Close()
 
-	c, err := moexoptcalc.New(srv.URL)
+	c, err := moexoptcalc.NewClient(srv.URL)
 	require.NoError(t, err, "New")
 	_, err = c.CalculateInitialMargin(
 		context.Background(),
@@ -300,11 +300,11 @@ func TestTransportError(t *testing.T) {
 	)
 	defer srv.Close()
 
-	c, err := moexoptcalc.New(srv.URL)
+	c, err := moexoptcalc.NewClient(srv.URL)
 	require.NoError(t, err, "New")
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel() // cancel before the call so Do fails immediately
-	_, err = c.ListAssets(ctx, moexoptcalc.ListAssetsParams{})
+	_, err = c.ListAssets(ctx, moexoptcalc.ListAssetsRequest{})
 	require.Error(t, err, "expected transport error")
 	var reqErr *moexoptcalc.RequestError
 	require.ErrorAs(

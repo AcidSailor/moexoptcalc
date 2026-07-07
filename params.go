@@ -113,23 +113,23 @@ func (d DateTime) MarshalJSON() ([]byte, error) {
 // invariant UnmarshalJSON establishes. The blessed way to build one in Go.
 func NewDateTime(t time.Time) DateTime { return DateTime{Time: t.In(mskZone)} }
 
-type ListAssetsParams struct {
+type ListAssetsRequest struct {
 	AssetType    *string `json:"asset_type,omitempty"`    // Тип базового актива.
 	AssetSubtype *string `json:"asset_subtype,omitempty"` // Подтип базового актива для фьючерсов.
 	Query        *string `json:"query,omitempty"`         // Фильтр названия БА.
 }
 
-type GetAssetParams struct {
+type GetAssetRequest struct {
 	AssetCode string  `json:"asset_code"`           // Торговый код БА.
 	AssetType *string `json:"asset_type,omitempty"` // Тип базового актива.
 }
 
-type ListFuturesParams struct {
+type ListFuturesRequest struct {
 	AssetCode      string `json:"asset_code"`                // Торговый код базового актива (фьючерса).
 	ExpirationDate *Date  `json:"expiration_date,omitempty"` // Дата погашения.
 }
 
-type ListOptionsParams struct {
+type ListOptionsRequest struct {
 	AssetCode      string   `json:"asset_code"`                // Торговый код БА.
 	AssetType      *string  `json:"asset_type,omitempty"`      // Тип базового актива.
 	ExpirationDate *Date    `json:"expiration_date,omitempty"` // Дата исполнения.
@@ -138,7 +138,7 @@ type ListOptionsParams struct {
 	Strike         *float64 `json:"strike,omitempty"`          // Страйк.
 }
 
-type GetOptionParams struct {
+type GetOptionRequest struct {
 	AssetCode         string   `json:"asset_code"`                    // Торговый код БА.
 	Secid             string   `json:"secid"`                         // Торговый код опциона.
 	AssetType         *string  `json:"asset_type,omitempty"`          // Тип базового актива.
@@ -147,41 +147,41 @@ type GetOptionParams struct {
 	Volatility        *float64 `json:"volatility,omitempty"`          // Переоценка: волатильность.
 }
 
-type ListOptionSeriesParams struct {
+type ListOptionSeriesRequest struct {
 	AssetCode string  `json:"asset_code"`           // Торговый код БА.
 	AssetType *string `json:"asset_type,omitempty"` // Тип базового актива.
 }
 
-type GetOptionSeriesParams struct {
+type GetOptionSeriesRequest struct {
 	AssetCode        string  `json:"asset_code"`           // Торговый код БА.
 	OptionseriesCode string  `json:"optionseries_code"`    // Код серии опционов.
 	AssetType        *string `json:"asset_type,omitempty"` // Тип базового актива.
 }
 
-type ListSeriesOptionsParams struct {
+type ListSeriesOptionsRequest struct {
 	AssetCode        string  `json:"asset_code"`            // Торговый код БА.
 	OptionseriesCode string  `json:"optionseries_code"`     // Код серии опционов.
 	AssetType        *string `json:"asset_type,omitempty"`  // Тип базового актива.
 	OptionType       *string `json:"option_type,omitempty"` // Тип опциона (call/put).
 	// Strike is *int32 here (spec: integer) — deliberately unlike
-	// ListOptionsParams.Strike, which is *float64 (spec: number). Don't "fix"
+	// ListOptionsRequest.Strike, which is *float64 (spec: number). Don't "fix"
 	// the mismatch; the two endpoints declare different wire types.
 	Strike *int32 `json:"strike,omitempty"` // Страйк.
 }
 
-type GetOptionBoardParams struct {
+type GetOptionBoardRequest struct {
 	AssetCode        string  `json:"asset_code"`           // Торговый код БА.
 	OptionseriesCode string  `json:"optionseries_code"`    // Код серии опционов.
 	AssetType        *string `json:"asset_type,omitempty"` // Тип базового актива.
 	Rows             *int32  `json:"rows,omitempty"`       // Число строк матрицы.
 }
 
-type GetVolatilityGraphParams struct {
+type GetVolatilityGraphRequest struct {
 	AssetCode        string  `json:"asset_code"`           // Торговый код БА.
 	OptionseriesCode string  `json:"optionseries_code"`    // Код серии опционов.
 	AssetType        *string `json:"asset_type,omitempty"` // Тип базового актива.
 }
 
-type CalculatePortfolioGraphParams struct {
+type CalculatePortfolioGraphRequest struct {
 	Indicator string `json:"indicator"` // Тип графика (path segment).
 }

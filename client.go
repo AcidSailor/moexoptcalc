@@ -19,7 +19,7 @@ const (
 )
 
 // Wire (snake_case) query-parameter keys, mirroring the json tags on the
-// *Params structs in params.go.
+// *Request structs in params.go.
 const (
 	keyAssetType         = "asset_type"
 	keyAssetSubtype      = "asset_subtype"
@@ -50,16 +50,16 @@ type config struct {
 }
 
 // WithHTTPClient sets the *http.Client for outgoing API calls — for a custom
-// Timeout, Transport, proxy, etc. A nil client is ignored: New falls back to
+// Timeout, Transport, proxy, etc. A nil client is ignored: NewClient falls back to
 // restkit's default (30s Timeout, stdlib default Transport).
 func WithHTTPClient(h *http.Client) ClientOption {
 	return func(c *config) { c.httpClient = h }
 }
 
-// New builds a Client targeting endpoint, applying any options. Use
+// NewClient builds a Client targeting endpoint, applying any options. Use
 // EndpointProduction for the public MOEX ISS host. Returns *ConfigError on an
 // empty endpoint.
-func New(endpoint string, opts ...ClientOption) (*Client, error) {
+func NewClient(endpoint string, opts ...ClientOption) (*Client, error) {
 	var cfg config
 	for _, opt := range opts {
 		opt(&cfg)
@@ -89,7 +89,7 @@ func setDate(v restkit.Values, key string, d *Date) restkit.Values {
 // ListAssets returns underlying assets, optionally filtered. GET /assets.
 func (c *Client) ListAssets(
 	ctx context.Context,
-	params ListAssetsParams,
+	params ListAssetsRequest,
 ) ([]Asset, error) {
 	q := restkit.NewValues().
 		Str(keyAssetType, params.AssetType).
@@ -108,10 +108,10 @@ func (c *Client) ListAssets(
 // GetAsset returns a single underlying. GET /assets/{asset_code}.
 func (c *Client) GetAsset(
 	ctx context.Context,
-	params GetAssetParams,
-) (Asset, error) {
+	params GetAssetRequest,
+) (*Asset, error) {
 	q := restkit.NewValues().Str(keyAssetType, params.AssetType)
-	return restkit.Do[Asset](
+	return restkit.Do[*Asset](
 		ctx,
 		c.rkClient,
 		http.MethodGet,
@@ -126,7 +126,7 @@ func (c *Client) GetAsset(
 // ListFutures returns futures on an underlying. GET /assets/{asset_code}/futures.
 func (c *Client) ListFutures(
 	ctx context.Context,
-	params ListFuturesParams,
+	params ListFuturesRequest,
 ) ([]Futures, error) {
 	q := setDate(restkit.NewValues(), keyExpirationDate, params.ExpirationDate)
 	return restkit.Do[[]Futures](
@@ -144,7 +144,7 @@ func (c *Client) ListFutures(
 // ListOptions returns options on an underlying. GET /assets/{asset_code}/options.
 func (c *Client) ListOptions(
 	ctx context.Context,
-	params ListOptionsParams,
+	params ListOptionsRequest,
 ) ([]Option, error) {
 	q := restkit.NewValues().
 		Str(keyAssetType, params.AssetType).
@@ -167,14 +167,14 @@ func (c *Client) ListOptions(
 // GetOption returns greeks/IV for one option. GET /assets/{asset_code}/options/{secid}.
 func (c *Client) GetOption(
 	ctx context.Context,
-	params GetOptionParams,
-) (OptionBrief, error) {
+	params GetOptionRequest,
+) (*OptionBrief, error) {
 	q := restkit.NewValues().
 		Str(keyAssetType, params.AssetType).
 		Int32(keyDaysUntilExpiring, params.DaysUntilExpiring).
 		Float(keyUnderlyingPrice, params.UnderlyingPrice).
 		Float(keyVolatility, params.Volatility)
-	return restkit.Do[OptionBrief](
+	return restkit.Do[*OptionBrief](
 		ctx,
 		c.rkClient,
 		http.MethodGet,
@@ -191,7 +191,7 @@ func (c *Client) GetOption(
 // ListOptionSeries returns series on an underlying. GET /assets/{asset_code}/optionseries.
 func (c *Client) ListOptionSeries(
 	ctx context.Context,
-	params ListOptionSeriesParams,
+	params ListOptionSeriesRequest,
 ) ([]OptionSeries, error) {
 	q := restkit.NewValues().Str(keyAssetType, params.AssetType)
 	return restkit.Do[[]OptionSeries](
@@ -209,10 +209,10 @@ func (c *Client) ListOptionSeries(
 // GetOptionSeries returns one series. GET /assets/{asset_code}/optionseries/{optionseries_code}.
 func (c *Client) GetOptionSeries(
 	ctx context.Context,
-	params GetOptionSeriesParams,
-) (OptionSeries, error) {
+	params GetOptionSeriesRequest,
+) (*OptionSeries, error) {
 	q := restkit.NewValues().Str(keyAssetType, params.AssetType)
-	return restkit.Do[OptionSeries](
+	return restkit.Do[*OptionSeries](
 		ctx,
 		c.rkClient,
 		http.MethodGet,
@@ -229,7 +229,7 @@ func (c *Client) GetOptionSeries(
 // ListSeriesOptions returns options in a series. GET .../optionseries/{optionseries_code}/options.
 func (c *Client) ListSeriesOptions(
 	ctx context.Context,
-	params ListSeriesOptionsParams,
+	params ListSeriesOptionsRequest,
 ) ([]Option, error) {
 	q := restkit.NewValues().
 		Str(keyAssetType, params.AssetType).
@@ -252,12 +252,12 @@ func (c *Client) ListSeriesOptions(
 // GetOptionBoard returns the strike×type board. GET .../optionseries/{optionseries_code}/optionboard.
 func (c *Client) GetOptionBoard(
 	ctx context.Context,
-	params GetOptionBoardParams,
-) (OptionBoard, error) {
+	params GetOptionBoardRequest,
+) (*OptionBoard, error) {
 	q := restkit.NewValues().
 		Str(keyAssetType, params.AssetType).
 		Int32(keyRows, params.Rows)
-	return restkit.Do[OptionBoard](
+	return restkit.Do[*OptionBoard](
 		ctx,
 		c.rkClient,
 		http.MethodGet,
@@ -274,7 +274,7 @@ func (c *Client) GetOptionBoard(
 // GetVolatilityGraph returns IV smile points. GET .../optionseries/{optionseries_code}/volatility_graph.
 func (c *Client) GetVolatilityGraph(
 	ctx context.Context,
-	params GetVolatilityGraphParams,
+	params GetVolatilityGraphRequest,
 ) ([]VolatilityGraphPoint, error) {
 	q := restkit.NewValues().Str(keyAssetType, params.AssetType)
 	return restkit.Do[[]VolatilityGraphPoint](
@@ -295,8 +295,8 @@ func (c *Client) GetVolatilityGraph(
 func (c *Client) CalculatePortfolio(
 	ctx context.Context,
 	req OptionPortfolio,
-) (CalculatedPortfolio, error) {
-	return restkit.Do[CalculatedPortfolio](
+) (*CalculatedPortfolio, error) {
+	return restkit.Do[*CalculatedPortfolio](
 		ctx,
 		c.rkClient,
 		http.MethodPost,
@@ -309,9 +309,9 @@ func (c *Client) CalculatePortfolio(
 func (c *Client) CalculatePortfolioGraph(
 	ctx context.Context,
 	req OptionPortfolio,
-	params CalculatePortfolioGraphParams,
-) (IndicatorGraph, error) {
-	return restkit.Do[IndicatorGraph](
+	params CalculatePortfolioGraphRequest,
+) (*IndicatorGraph, error) {
+	return restkit.Do[*IndicatorGraph](
 		ctx,
 		c.rkClient,
 		http.MethodPost,
