@@ -183,4 +183,4 @@ API MOEX ISS Options Calculator.
 
 ## License
 
-GNU Affero General Public License v3.0. See [LICENSE](LICENSE).
+Apache-2.0. See [LICENSE](LICENSE).
