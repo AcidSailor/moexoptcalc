@@ -1,5 +1,5 @@
-github.com/acidsailor/restkit v0.2.0 h1:4AXUZNwUpR4YJfbiVF8xuYZy66cko28d0WZLT9C4zo4=
-github.com/acidsailor/restkit v0.2.0/go.mod h1:7Ukp7T8lXpEUjrj037z6eZk2CIpzF4G0G0mSV8RJtYw=
+github.com/acidsailor/restkit v0.2.1 h1:2u0JZ8pQe4+Iki53xVxHBXmjXKYnPo0qariv7roy0xk=
+github.com/acidsailor/restkit v0.2.1/go.mod h1:S0GzttRL1mbRPvk4L5u/xCQYHzA9jpIm1SDPzZVpjeg=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
