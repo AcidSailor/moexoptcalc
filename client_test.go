@@ -42,8 +42,7 @@ func TestNew_InvalidConfig(t *testing.T) {
 			if err == nil {
 				t.Fatalf("expected error, got nil")
 			}
-			var cfgErr *moexoptcalc.ConfigError
-			if !errors.As(err, &cfgErr) {
+			if _, ok := errors.AsType[*moexoptcalc.ConfigError](err); !ok {
 				t.Errorf("err %v should unwrap to *ConfigError", err)
 			}
 		})
