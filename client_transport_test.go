@@ -205,7 +205,7 @@ func TestStrike_WireTypes(t *testing.T) {
 	})
 }
 
-// TestPathEscaping verifies path segments are url.PathEscape'd: a code with a
+// TestPathEscaping verifies path segments are escaped (restkit.Pathf): a code with a
 // "?" stays in the path (escaped) rather than splitting off a query string.
 func TestPathEscaping(t *testing.T) {
 	t.Parallel()
@@ -224,6 +224,38 @@ func TestPathEscaping(t *testing.T) {
 		"path keeps the escaped code",
 	)
 	assert.Empty(t, *gotQuery, "the '?' must not leak into a query string")
+}
+
+// TestPathEscaping_Slash checks a '/' inside a path value is escaped within its
+// own segment (restkit.Pathf) instead of injecting an extra segment.
+func TestPathEscaping_Slash(t *testing.T) {
+	t.Parallel()
+	var gotRawPath string
+	srv := httptest.NewServer(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			gotRawPath = r.URL.EscapedPath()
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = io.WriteString(w, "{}")
+		}),
+	)
+	t.Cleanup(srv.Close)
+
+	c, err := moexoptcalc.NewClient(srv.URL)
+	require.NoError(t, err, "New")
+	_, err = c.GetOptionSeries(
+		context.Background(),
+		moexoptcalc.GetOptionSeriesRequest{
+			AssetCode:        "SI/X",
+			OptionseriesCode: "Si 6.26",
+		},
+	)
+	require.NoError(t, err, "GetOptionSeries")
+	assert.Equal(
+		t,
+		"/assets/SI%2FX/optionseries/Si%206.26",
+		gotRawPath,
+		"each arg escaped as one segment",
+	)
 }
 
 // TestErrorMapping verifies a non-2xx response maps to *ResponseError carrying

@@ -6,7 +6,6 @@ package moexoptcalc
 import (
 	"context"
 	"net/http"
-	"net/url"
 
 	"github.com/acidsailor/restkit"
 )
@@ -105,9 +104,7 @@ func (c *Client) GetAsset(
 		ctx,
 		c.rkClient,
 		http.MethodGet,
-		"/assets/"+url.PathEscape(
-			params.AssetCode,
-		),
+		restkit.Pathf("/assets/%s", params.AssetCode),
 		nil,
 		restkit.WithQuery(q.Values),
 	)
@@ -123,9 +120,7 @@ func (c *Client) ListFutures(
 		ctx,
 		c.rkClient,
 		http.MethodGet,
-		"/assets/"+url.PathEscape(
-			params.AssetCode,
-		)+"/futures",
+		restkit.Pathf("/assets/%s/futures", params.AssetCode),
 		nil,
 		restkit.WithQuery(q.Values),
 	)
@@ -146,9 +141,7 @@ func (c *Client) ListOptions(
 		ctx,
 		c.rkClient,
 		http.MethodGet,
-		"/assets/"+url.PathEscape(
-			params.AssetCode,
-		)+"/options",
+		restkit.Pathf("/assets/%s/options", params.AssetCode),
 		nil,
 		restkit.WithQuery(q.Values),
 	)
@@ -168,9 +161,9 @@ func (c *Client) GetOption(
 		ctx,
 		c.rkClient,
 		http.MethodGet,
-		"/assets/"+url.PathEscape(
+		restkit.Pathf(
+			"/assets/%s/options/%s",
 			params.AssetCode,
-		)+"/options/"+url.PathEscape(
 			params.Secid,
 		),
 		nil,
@@ -188,9 +181,7 @@ func (c *Client) ListOptionSeries(
 		ctx,
 		c.rkClient,
 		http.MethodGet,
-		"/assets/"+url.PathEscape(
-			params.AssetCode,
-		)+"/optionseries",
+		restkit.Pathf("/assets/%s/optionseries", params.AssetCode),
 		nil,
 		restkit.WithQuery(q.Values),
 	)
@@ -206,9 +197,9 @@ func (c *Client) GetOptionSeries(
 		ctx,
 		c.rkClient,
 		http.MethodGet,
-		"/assets/"+url.PathEscape(
+		restkit.Pathf(
+			"/assets/%s/optionseries/%s",
 			params.AssetCode,
-		)+"/optionseries/"+url.PathEscape(
 			params.OptionseriesCode,
 		),
 		nil,
@@ -229,11 +220,11 @@ func (c *Client) ListSeriesOptions(
 		ctx,
 		c.rkClient,
 		http.MethodGet,
-		"/assets/"+url.PathEscape(
+		restkit.Pathf(
+			"/assets/%s/optionseries/%s/options",
 			params.AssetCode,
-		)+"/optionseries/"+url.PathEscape(
 			params.OptionseriesCode,
-		)+"/options",
+		),
 		nil,
 		restkit.WithQuery(q.Values),
 	)
@@ -251,11 +242,11 @@ func (c *Client) GetOptionBoard(
 		ctx,
 		c.rkClient,
 		http.MethodGet,
-		"/assets/"+url.PathEscape(
+		restkit.Pathf(
+			"/assets/%s/optionseries/%s/optionboard",
 			params.AssetCode,
-		)+"/optionseries/"+url.PathEscape(
 			params.OptionseriesCode,
-		)+"/optionboard",
+		),
 		nil,
 		restkit.WithQuery(q.Values),
 	)
@@ -271,11 +262,11 @@ func (c *Client) GetVolatilityGraph(
 		ctx,
 		c.rkClient,
 		http.MethodGet,
-		"/assets/"+url.PathEscape(
+		restkit.Pathf(
+			"/assets/%s/optionseries/%s/volatility_graph",
 			params.AssetCode,
-		)+"/optionseries/"+url.PathEscape(
 			params.OptionseriesCode,
-		)+"/volatility_graph",
+		),
 		nil,
 		restkit.WithQuery(q.Values),
 	)
@@ -305,7 +296,7 @@ func (c *Client) CalculatePortfolioGraph(
 		ctx,
 		c.rkClient,
 		http.MethodPost,
-		"/portfolio/graph/"+url.PathEscape(params.Indicator),
+		restkit.Pathf("/portfolio/graph/%s", params.Indicator),
 		req,
 	)
 }
