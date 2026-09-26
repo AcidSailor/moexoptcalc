@@ -8,7 +8,7 @@ import (
 
 // Per-operation parameter structs. Path params are required strings; optional
 // query filters are pointers (nil = omitted); date filters are *Date, rendered
-// to the wire date format when non-nil (see setDate in client.go).
+// to the wire date format when non-nil (see Date.QueryValue).
 //
 // The json tags carry the wire (snake_case) names so a JSON caller (e.g. an
 // MCP server driving the OpenAPI spec) can decode straight into a params
@@ -47,6 +47,16 @@ func (d *Date) UnmarshalJSON(b []byte) error {
 // MarshalJSON renders the date as a "2006-01-02" JSON string.
 func (d Date) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + d.Format(dateLayout) + `"`), nil
+}
+
+// QueryValue renders the date as a "2006-01-02" query parameter. A nil *Date
+// reports ok=false so the filter is omitted; it implements
+// restkit.QueryValuer.
+func (d *Date) QueryValue() (string, bool) {
+	if d == nil {
+		return "", false
+	}
+	return d.Format(dateLayout), true
 }
 
 // NewDate wraps t as a Date — the blessed way to build one in Go. The wire

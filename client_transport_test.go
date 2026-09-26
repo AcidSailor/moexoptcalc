@@ -104,8 +104,8 @@ func captureServer(t *testing.T) (*httptest.Server, *string, *string) {
 }
 
 // TestListFutures_DateQuery checks a non-nil *Date filter reaches the wire in
-// the bare "2006-01-02" form under expiration_date — the hand-written setDate
-// path the generic restkit setters can't cover.
+// the bare "2006-01-02" form under expiration_date, via Date.QueryValue and
+// restkit's Values.Param (the built-in setters can't carry a local type).
 func TestListFutures_DateQuery(t *testing.T) {
 	t.Parallel()
 	srv, gotPath, gotQuery := captureServer(t)
@@ -135,6 +135,32 @@ func TestListFutures_NilDateOmitted(t *testing.T) {
 	})
 	require.NoError(t, err, "ListFutures")
 	assert.Empty(t, *gotQuery, "nil date must be omitted from the query")
+}
+
+// TestListOptions_DateChainedWithFilters checks the *Date filter chains with the
+// built-in setters: every non-nil filter lands in the query alongside it.
+func TestListOptions_DateChainedWithFilters(t *testing.T) {
+	t.Parallel()
+	srv, gotPath, gotQuery := captureServer(t)
+
+	c, err := moexoptcalc.NewClient(srv.URL)
+	require.NoError(t, err, "New")
+	exp := moexoptcalc.NewDate(time.Date(2026, 6, 18, 0, 0, 0, 0, time.UTC))
+	assetType, strike := "futures", 95000.5
+	_, err = c.ListOptions(context.Background(), moexoptcalc.ListOptionsRequest{
+		AssetCode:      "Si",
+		AssetType:      &assetType,
+		Strike:         &strike,
+		ExpirationDate: &exp,
+	})
+	require.NoError(t, err, "ListOptions")
+	assert.Equal(t, "/assets/Si/options", *gotPath, "path")
+	assert.Equal(
+		t,
+		"asset_type=futures&expiration_date=2026-06-18&strike=95000.5",
+		*gotQuery,
+		"query",
+	)
 }
 
 // TestStrike_WireTypes locks the deliberate per-endpoint strike type split:
@@ -179,7 +205,7 @@ func TestStrike_WireTypes(t *testing.T) {
 	})
 }
 
-// TestPathEscaping verifies path segments are url.PathEscape'd: a code with a
+// TestPathEscaping verifies path segments are escaped (restkit.Pathf): a code with a
 // "?" stays in the path (escaped) rather than splitting off a query string.
 func TestPathEscaping(t *testing.T) {
 	t.Parallel()
@@ -198,6 +224,38 @@ func TestPathEscaping(t *testing.T) {
 		"path keeps the escaped code",
 	)
 	assert.Empty(t, *gotQuery, "the '?' must not leak into a query string")
+}
+
+// TestPathEscaping_Slash checks a '/' inside a path value is escaped within its
+// own segment (restkit.Pathf) instead of injecting an extra segment.
+func TestPathEscaping_Slash(t *testing.T) {
+	t.Parallel()
+	var gotRawPath string
+	srv := httptest.NewServer(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			gotRawPath = r.URL.EscapedPath()
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = io.WriteString(w, "{}")
+		}),
+	)
+	t.Cleanup(srv.Close)
+
+	c, err := moexoptcalc.NewClient(srv.URL)
+	require.NoError(t, err, "New")
+	_, err = c.GetOptionSeries(
+		context.Background(),
+		moexoptcalc.GetOptionSeriesRequest{
+			AssetCode:        "SI/X",
+			OptionseriesCode: "Si 6.26",
+		},
+	)
+	require.NoError(t, err, "GetOptionSeries")
+	assert.Equal(
+		t,
+		"/assets/SI%2FX/optionseries/Si%206.26",
+		gotRawPath,
+		"each arg escaped as one segment",
+	)
 }
 
 // TestErrorMapping verifies a non-2xx response maps to *ResponseError carrying
