@@ -75,6 +75,24 @@ func NewClient(endpoint string, opts ...ClientOption) (*Client, error) {
 	return &Client{rkClient: rkClient}, nil
 }
 
+// get issues a GET for path with query q and decodes the JSON body into T —
+// the shape shared by every read endpoint.
+func get[T any](
+	ctx context.Context,
+	c *Client,
+	path string,
+	q restkit.Values,
+) (T, error) {
+	return restkit.Do[T](
+		ctx,
+		c.rkClient,
+		http.MethodGet,
+		path,
+		nil,
+		restkit.WithQuery(q.Values),
+	)
+}
+
 // ListAssets returns underlying assets, optionally filtered. GET /assets.
 func (c *Client) ListAssets(
 	ctx context.Context,
@@ -84,14 +102,7 @@ func (c *Client) ListAssets(
 		Str(keyAssetType, params.AssetType).
 		Str(keyAssetSubtype, params.AssetSubtype).
 		Str(keyQuery, params.Query)
-	return restkit.Do[[]Asset](
-		ctx,
-		c.rkClient,
-		http.MethodGet,
-		"/assets",
-		nil,
-		restkit.WithQuery(q.Values),
-	)
+	return get[[]Asset](ctx, c, "/assets", q)
 }
 
 // GetAsset returns a single underlying. GET /assets/{asset_code}.
@@ -100,14 +111,7 @@ func (c *Client) GetAsset(
 	params GetAssetRequest,
 ) (*Asset, error) {
 	q := restkit.NewValues().Str(keyAssetType, params.AssetType)
-	return restkit.Do[*Asset](
-		ctx,
-		c.rkClient,
-		http.MethodGet,
-		restkit.Pathf("/assets/%s", params.AssetCode),
-		nil,
-		restkit.WithQuery(q.Values),
-	)
+	return get[*Asset](ctx, c, restkit.Pathf("/assets/%s", params.AssetCode), q)
 }
 
 // ListFutures returns futures on an underlying. GET /assets/{asset_code}/futures.
@@ -116,13 +120,11 @@ func (c *Client) ListFutures(
 	params ListFuturesRequest,
 ) ([]Futures, error) {
 	q := restkit.NewValues().Param(keyExpirationDate, params.ExpirationDate)
-	return restkit.Do[[]Futures](
+	return get[[]Futures](
 		ctx,
-		c.rkClient,
-		http.MethodGet,
+		c,
 		restkit.Pathf("/assets/%s/futures", params.AssetCode),
-		nil,
-		restkit.WithQuery(q.Values),
+		q,
 	)
 }
 
@@ -137,13 +139,11 @@ func (c *Client) ListOptions(
 		Str(keySeriesType, params.SeriesType).
 		Float(keyStrike, params.Strike).
 		Param(keyExpirationDate, params.ExpirationDate)
-	return restkit.Do[[]Option](
+	return get[[]Option](
 		ctx,
-		c.rkClient,
-		http.MethodGet,
+		c,
 		restkit.Pathf("/assets/%s/options", params.AssetCode),
-		nil,
-		restkit.WithQuery(q.Values),
+		q,
 	)
 }
 
@@ -157,17 +157,15 @@ func (c *Client) GetOption(
 		Int32(keyDaysUntilExpiring, params.DaysUntilExpiring).
 		Float(keyUnderlyingPrice, params.UnderlyingPrice).
 		Float(keyVolatility, params.Volatility)
-	return restkit.Do[*OptionBrief](
+	return get[*OptionBrief](
 		ctx,
-		c.rkClient,
-		http.MethodGet,
+		c,
 		restkit.Pathf(
 			"/assets/%s/options/%s",
 			params.AssetCode,
 			params.Secid,
 		),
-		nil,
-		restkit.WithQuery(q.Values),
+		q,
 	)
 }
 
@@ -177,13 +175,11 @@ func (c *Client) ListOptionSeries(
 	params ListOptionSeriesRequest,
 ) ([]OptionSeries, error) {
 	q := restkit.NewValues().Str(keyAssetType, params.AssetType)
-	return restkit.Do[[]OptionSeries](
+	return get[[]OptionSeries](
 		ctx,
-		c.rkClient,
-		http.MethodGet,
+		c,
 		restkit.Pathf("/assets/%s/optionseries", params.AssetCode),
-		nil,
-		restkit.WithQuery(q.Values),
+		q,
 	)
 }
 
@@ -193,17 +189,15 @@ func (c *Client) GetOptionSeries(
 	params GetOptionSeriesRequest,
 ) (*OptionSeries, error) {
 	q := restkit.NewValues().Str(keyAssetType, params.AssetType)
-	return restkit.Do[*OptionSeries](
+	return get[*OptionSeries](
 		ctx,
-		c.rkClient,
-		http.MethodGet,
+		c,
 		restkit.Pathf(
 			"/assets/%s/optionseries/%s",
 			params.AssetCode,
 			params.OptionseriesCode,
 		),
-		nil,
-		restkit.WithQuery(q.Values),
+		q,
 	)
 }
 
@@ -216,17 +210,15 @@ func (c *Client) ListSeriesOptions(
 		Str(keyAssetType, params.AssetType).
 		Str(keyOptionType, params.OptionType).
 		Int32(keyStrike, params.Strike)
-	return restkit.Do[[]Option](
+	return get[[]Option](
 		ctx,
-		c.rkClient,
-		http.MethodGet,
+		c,
 		restkit.Pathf(
 			"/assets/%s/optionseries/%s/options",
 			params.AssetCode,
 			params.OptionseriesCode,
 		),
-		nil,
-		restkit.WithQuery(q.Values),
+		q,
 	)
 }
 
@@ -238,17 +230,15 @@ func (c *Client) GetOptionBoard(
 	q := restkit.NewValues().
 		Str(keyAssetType, params.AssetType).
 		Int32(keyRows, params.Rows)
-	return restkit.Do[*OptionBoard](
+	return get[*OptionBoard](
 		ctx,
-		c.rkClient,
-		http.MethodGet,
+		c,
 		restkit.Pathf(
 			"/assets/%s/optionseries/%s/optionboard",
 			params.AssetCode,
 			params.OptionseriesCode,
 		),
-		nil,
-		restkit.WithQuery(q.Values),
+		q,
 	)
 }
 
@@ -258,17 +248,15 @@ func (c *Client) GetVolatilityGraph(
 	params GetVolatilityGraphRequest,
 ) ([]VolatilityGraphPoint, error) {
 	q := restkit.NewValues().Str(keyAssetType, params.AssetType)
-	return restkit.Do[[]VolatilityGraphPoint](
+	return get[[]VolatilityGraphPoint](
 		ctx,
-		c.rkClient,
-		http.MethodGet,
+		c,
 		restkit.Pathf(
 			"/assets/%s/optionseries/%s/volatility_graph",
 			params.AssetCode,
 			params.OptionseriesCode,
 		),
-		nil,
-		restkit.WithQuery(q.Values),
+		q,
 	)
 }
 
