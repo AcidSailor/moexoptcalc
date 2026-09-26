@@ -76,16 +76,6 @@ func NewClient(endpoint string, opts ...ClientOption) (*Client, error) {
 	return &Client{rkClient: rkClient}, nil
 }
 
-// setDate adds a non-nil *Date filter to v in the wire date format. The
-// generic restkit.Values setters can't carry the package-local Date type, so
-// dates go through the embedded Set behind this nil-check.
-func setDate(v restkit.Values, key string, d *Date) restkit.Values {
-	if d != nil {
-		v.Set(key, d.Format(dateLayout))
-	}
-	return v
-}
-
 // ListAssets returns underlying assets, optionally filtered. GET /assets.
 func (c *Client) ListAssets(
 	ctx context.Context,
@@ -128,7 +118,7 @@ func (c *Client) ListFutures(
 	ctx context.Context,
 	params ListFuturesRequest,
 ) ([]Futures, error) {
-	q := setDate(restkit.NewValues(), keyExpirationDate, params.ExpirationDate)
+	q := restkit.NewValues().Param(keyExpirationDate, params.ExpirationDate)
 	return restkit.Do[[]Futures](
 		ctx,
 		c.rkClient,
@@ -150,8 +140,8 @@ func (c *Client) ListOptions(
 		Str(keyAssetType, params.AssetType).
 		Str(keyOptionType, params.OptionType).
 		Str(keySeriesType, params.SeriesType).
-		Float(keyStrike, params.Strike)
-	q = setDate(q, keyExpirationDate, params.ExpirationDate)
+		Float(keyStrike, params.Strike).
+		Param(keyExpirationDate, params.ExpirationDate)
 	return restkit.Do[[]Option](
 		ctx,
 		c.rkClient,

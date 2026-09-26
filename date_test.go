@@ -93,3 +93,16 @@ func TestNewDateTime_NormalizesToMoscow(t *testing.T) {
 		t.Errorf("NewDateTime marshal = %s, want \"2026-05-12T21:39:22\"", out)
 	}
 }
+
+// QueryValue renders a non-nil *Date in the wire form and reports ok=false for
+// a nil receiver, so restkit's Values.Param omits the filter.
+func TestDate_QueryValue(t *testing.T) {
+	var nilDate *moexoptcalc.Date
+	if s, ok := nilDate.QueryValue(); ok || s != "" {
+		t.Errorf("nil QueryValue = (%q, %v), want (\"\", false)", s, ok)
+	}
+	d := moexoptcalc.NewDate(time.Date(2026, 5, 12, 23, 30, 0, 0, time.UTC))
+	if s, ok := d.QueryValue(); !ok || s != "2026-05-12" {
+		t.Errorf("QueryValue = (%q, %v), want (\"2026-05-12\", true)", s, ok)
+	}
+}
