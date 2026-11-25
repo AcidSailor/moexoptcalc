@@ -6,6 +6,7 @@ package moexoptcalc
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/acidsailor/restkit"
 )
@@ -48,9 +49,8 @@ type config struct {
 	httpClient *http.Client
 }
 
-// WithHTTPClient sets the *http.Client for outgoing API calls — for a custom
-// Timeout, Transport, proxy, etc. A nil client is ignored: NewClient falls back to
-// restkit's default (30s Timeout, stdlib default Transport).
+// WithHTTPClient overrides the default MOEX client, including its TLS policy.
+// A nil client uses the default MOEX transport and a 30s timeout.
 func WithHTTPClient(h *http.Client) ClientOption {
 	return func(c *config) { c.httpClient = h }
 }
@@ -61,9 +61,25 @@ func WithHTTPClient(h *http.Client) ClientOption {
 func NewClient(endpoint string, opts ...ClientOption) (*Client, error) {
 	var cfg config
 	for _, opt := range opts {
-		opt(&cfg)
+		if opt != nil {
+			opt(&cfg)
+		}
 	}
-	// A nil cfg.httpClient is benign: restkit falls back to its default.
+	if cfg.httpClient == nil {
+		// Validate the endpoint before doing platform-dependent TLS setup so an
+		// invalid endpoint consistently returns restkit's ConfigError.
+		if _, err := restkit.New(
+			endpoint,
+			restkit.WithName(clientName),
+		); err != nil {
+			return nil, err
+		}
+		h, err := defaultHTTPClient(30 * time.Second)
+		if err != nil {
+			return nil, err
+		}
+		cfg.httpClient = h
+	}
 	rkClient, err := restkit.New(
 		endpoint,
 		restkit.WithName(clientName),

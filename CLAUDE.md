@@ -5,7 +5,7 @@ Guidance for working in this repo.
 ## Overview
 
 `moexoptcalc` is a Go **library** (module `github.com/acidsailor/moexoptcalc`,
-Go 1.26) — a client for the public **MOEX ISS Options Calculator** API
+Go 1.27) — a client for the public **MOEX ISS Options Calculator** API
 (`https://iss.moex.com/iss/apps/option-calc/v1`). It returns the official
 greeks, IV, theoretical prices, and portfolio/margin metrics MOEX publishes
 for FORTS options. The API is public (no auth).
@@ -44,8 +44,8 @@ CI runs the reusable workflow `acidsailor/go-scaffolds/.github/workflows/go-ci.y
 
 ## Architecture
 
-Single public package `moexoptcalc` at the repo root (no `internal/`). The
-generated models and the hand-written transport share that one package.
+The root `moexoptcalc` package contains the generated models and API client.
+`http_client.go` configures TLS using the embedded root in `certs/`.
 
 - **Models are code-generated** by oapi-codegen v2 into `models.gen.go` as
   plain Go structs (config `oapi-codegen.yaml`, `generate: models: true`).
