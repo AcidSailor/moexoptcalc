@@ -40,17 +40,27 @@ type Client struct {
 	rkClient *restkit.Client
 }
 
-// ClientOption configures a Client at construction time. See WithHTTPClient.
+// ClientOption configures a Client at construction time.
+// See WithTimeout and WithHTTPClient.
 // (Named ClientOption, not Option, since Option is the generated model for an
 // option instrument.)
 type ClientOption func(*config)
 
 type config struct {
 	httpClient *http.Client
+	timeout    time.Duration
 }
 
-// WithHTTPClient overrides the default MOEX client, including its TLS policy.
-// A nil client uses the default MOEX transport and a 30s timeout.
+// WithTimeout sets the default HTTP client's timeout, preserving MOEX TLS trust.
+// The default is 30 seconds. Zero or negative values disable the timeout.
+// A non-nil WithHTTPClient takes precedence, regardless of option order.
+func WithTimeout(timeout time.Duration) ClientOption {
+	return func(c *config) { c.timeout = timeout }
+}
+
+// WithHTTPClient overrides the default MOEX client, including its TLS policy
+// and timeout. A nil client uses the default MOEX transport with WithTimeout
+// or the default 30s timeout.
 func WithHTTPClient(h *http.Client) ClientOption {
 	return func(c *config) { c.httpClient = h }
 }
@@ -59,7 +69,7 @@ func WithHTTPClient(h *http.Client) ClientOption {
 // EndpointProduction for the public MOEX ISS host. Returns *ConfigError on an
 // empty endpoint.
 func NewClient(endpoint string, opts ...ClientOption) (*Client, error) {
-	var cfg config
+	cfg := config{timeout: 30 * time.Second}
 	for _, opt := range opts {
 		if opt != nil {
 			opt(&cfg)
@@ -74,7 +84,7 @@ func NewClient(endpoint string, opts ...ClientOption) (*Client, error) {
 		); err != nil {
 			return nil, err
 		}
-		h, err := defaultHTTPClient(30 * time.Second)
+		h, err := defaultHTTPClient(cfg.timeout)
 		if err != nil {
 			return nil, err
 		}

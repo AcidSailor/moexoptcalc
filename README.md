@@ -97,8 +97,18 @@ the system roots plus the embedded Russian Trusted Root CA.
 When the process uses the standard transport, each default client owns its
 connection pool. Reuse the API client across requests and goroutines to reuse
 connections.
-Passing a client through `WithHTTPClient` gives that client control of
-timeouts and certificate verification. A nil client selects the default.
+Use `WithTimeout` to change the timeout without replacing the TLS setup:
+
+```go
+c, err := moexoptcalc.NewClient(moexoptcalc.EndpointProduction,
+    moexoptcalc.WithTimeout(60*time.Second))
+```
+
+Zero or negative timeouts disable the HTTP client timeout.
+Passing a non-nil client through `WithHTTPClient` gives that client control of
+timeouts and certificate verification, taking precedence over `WithTimeout`
+regardless of option order. A nil client selects the default TLS setup and the
+configured timeout.
 
 ### Observability
 
