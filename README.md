@@ -32,7 +32,7 @@ API docs: <https://iss.moex.com/iss/apps/option-calc/v1/docs>
 go get github.com/acidsailor/moexoptcalc
 ```
 
-Requires Go 1.26+.
+Requires Go 1.27+.
 
 ## Quickstart
 
@@ -92,20 +92,17 @@ use `moexoptcalc.EndpointProduction` for the public MOEX ISS host. The
 Options Calculator API has no separate test environment and needs no
 credentials, so there are **no environment variables** to set.
 
-By default `New` uses an `*http.Client` with a 30s timeout and the stdlib
-default transport. Override it with `WithHTTPClient` (for a custom timeout,
-transport, or proxy):
-
-```go
-c, err := moexoptcalc.NewClient(moexoptcalc.EndpointProduction,
-	moexoptcalc.WithHTTPClient(&http.Client{Timeout: 60 * time.Second}))
-```
-
-A nil `*http.Client` is ignored, falling back to the default.
+The default HTTP client uses a 30-second timeout and verifies MOEX TLS with
+the system roots plus the embedded Russian Trusted Root CA.
+When the process uses the standard transport, each default client owns its
+connection pool. Reuse the API client across requests and goroutines to reuse
+connections.
+Passing a client through `WithHTTPClient` gives that client control of
+timeouts and certificate verification. A nil client selects the default.
 
 ### Observability
 
-`New` wraps the HTTP transport with `otelhttp`, so calls emit spans and the
+`NewClient` wraps the HTTP transport with `otelhttp`, so calls emit spans and the
 standard HTTP-client metrics (`http.client.request.duration`,
 `http.client.request.body.size`) through the **global** OTel providers. Opt
 in by registering providers via `otel.SetTracerProvider` /
@@ -120,7 +117,7 @@ an unwrap:
 
 | Type | Returned when |
 | --- | --- |
-| `*moexoptcalc.ConfigError` | `New` got an empty endpoint. |
+| `*moexoptcalc.ConfigError` | `NewClient` got an empty endpoint. |
 | `*moexoptcalc.RequestError` | a call failed to marshal, build, hook, send, read, or unmarshal (incl. a cancelled context). The `Op` field names the stage. |
 | `*moexoptcalc.ResponseError` | a non-2xx response. Exposes `StatusCode` and raw `Body`; not a `*RequestError`. |
 
