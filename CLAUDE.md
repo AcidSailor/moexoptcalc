@@ -57,8 +57,9 @@ The root `moexoptcalc` package contains the generated models and API client.
   ...ClientOption)` is the entry point; returns `*ConfigError` on an empty
   endpoint. The 13 per-operation methods are thin wrappers over generic
   `restkit.Do[T]`. The option type is `ClientOption` (not `Option`, the
-  generated model for an option instrument); the only option is
-  `WithHTTPClient`.
+  generated model for an option instrument). `WithTimeout` changes the default
+  client's 30s timeout without replacing MOEX TLS trust. A non-nil
+  `WithHTTPClient` overrides both TLS and timeout, regardless of option order.
 - **`params.go`** holds the per-method `*Request` structs. Path params are
   required strings; optional query filters are pointers; date filters are
   `*Date`. The `Date` (date-only, `2006-01-02`) and `DateTime` (parsed through

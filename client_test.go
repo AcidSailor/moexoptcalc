@@ -88,7 +88,7 @@ func TestWithHTTPClient_StubIsCalled(t *testing.T) {
 }
 
 // TestWithHTTPClient_NilFallsBackToDefault verifies a nil *http.Client option
-// is benign: New ignores it and uses restkit's default.
+// is benign: NewClient uses the default MOEX-aware client.
 func TestWithHTTPClient_NilFallsBackToDefault(t *testing.T) {
 	t.Parallel()
 	c, err := moexoptcalc.NewClient(moexoptcalc.EndpointProduction,
